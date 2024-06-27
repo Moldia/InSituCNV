@@ -80,32 +80,10 @@ def calculate_nonzero_average(gene_count_mtx):
     return mean_non_zero
 
 
-
-def plot_read_depth_distribution(adata):
-    
-    adata = convert_to_raw(h5ad_file)
-    
-    # Calculate the read depth for each cell
-    count_matrix = adata.X.toarray() if sp.issparse(adata.X) else adata.X
-    read_depths = np.sum(count_matrix, axis=1)
-    
-    # Plot the distribution using seaborn
-    plt.figure(figsize=(10, 6))
-    sns.histplot(read_depths, kde=True, bins=50)
-    plt.xlabel('Read Depth (Total Reads per Cell)')
-    plt.ylabel('Frequency')
-    plt.title('Read Depth Distribution')
-    plt.show
-
-
 # Is binomial distribution the best approach to subsample the read depth?
-def downsample_counts(downsample_factor, adata=None, gene_count_mtx=None, output_file_path=None):
-    if adata:
-        adata_count_mtx = create_raw_count_mtx(adata)
-        downsampled_matrix = adata_count_mtx.map(lambda x: np.random.binomial(n=x, p=downsample_factor))
-
-    if gene_count_mtx:
-        downsampled_matrix = gene_count_mtx.map(lambda x: np.random.binomial(n=x, p=downsample_factor)) 
+def downsample_counts(adata, downsample_factor, output_file_path=None):
+    adata_count_mtx = create_raw_count_mtx(adata)
+    downsampled_matrix = adata_count_mtx.map(lambda x: np.random.binomial(n=x, p=downsample_factor))
 
     if output_file_path:
         downsampled_matrix.to_csv(output_file_path)
