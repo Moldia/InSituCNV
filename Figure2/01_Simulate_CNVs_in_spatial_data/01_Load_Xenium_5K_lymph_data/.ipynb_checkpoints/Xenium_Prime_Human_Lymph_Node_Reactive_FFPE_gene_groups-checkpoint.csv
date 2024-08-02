@@ -1,0 +1,512 @@
+gene,group
+ABO,Endothelial Cell
+ADGRL4,Endothelial Cell
+AVPR2,Endothelial Cell
+BCAM,Endothelial Cell
+BCL6B,Endothelial Cell
+BMP2,Endothelial Cell
+BMPER,Endothelial Cell
+CA4,Endothelial Cell
+CALCRL,Endothelial Cell
+CARD10,Endothelial Cell
+CAV2,Endothelial Cell
+CAVIN2,Endothelial Cell
+CCL16,Endothelial Cell
+CCL23,Endothelial Cell
+CD109,Endothelial Cell
+CD34,Endothelial Cell
+CD93,Endothelial Cell
+CDH5,Endothelial Cell
+CFH,Endothelial Cell
+CH25H,Endothelial Cell
+CLDN5,Endothelial Cell
+CLEC14A,Endothelial Cell
+CNKSR3,Endothelial Cell
+COL4A1,Endothelial Cell
+COL4A2,Endothelial Cell
+CPXM2,Endothelial Cell
+CTNNAL1,Endothelial Cell
+CX3CL1,Endothelial Cell
+CXCL2,Endothelial Cell
+CXCL5,Endothelial Cell
+DLL4,Endothelial Cell
+EDN1,Endothelial Cell
+EGFL7,Endothelial Cell
+ENG,Endothelial Cell
+ERG,Endothelial Cell
+FAM107A,Endothelial Cell
+FENDRR,Endothelial Cell
+FLT4,Endothelial Cell
+FZD4,Endothelial Cell
+GABRA2,Endothelial Cell
+GIPC2,Endothelial Cell
+GJA1,Endothelial Cell
+HOXD9,Endothelial Cell
+HSPA2,Endothelial Cell
+HSPG2,Endothelial Cell
+IGFBP2,Endothelial Cell
+IL1R1,Endothelial Cell
+IL33,Endothelial Cell
+INHBB,Endothelial Cell
+INMT,Endothelial Cell
+ITGB4,Endothelial Cell
+JAM2,Endothelial Cell
+KDR,Endothelial Cell
+KL,Endothelial Cell
+LIFR,Endothelial Cell
+LIPG,Endothelial Cell,Mature Conventional Dendritic Cell
+LOX,Endothelial Cell
+LRG1,Endothelial Cell
+LRRC32,Endothelial Cell
+MAGI1,Endothelial Cell
+MALL,Endothelial Cell
+MAPK11,Endothelial Cell
+MAPK12,Endothelial Cell
+MARCO,Endothelial Cell
+MCAM,Endothelial Cell
+MECOM,Endothelial Cell
+MET,Endothelial Cell
+MMRN2,Endothelial Cell
+MYOF,Endothelial Cell
+NES,Endothelial Cell
+NOS3,Endothelial Cell
+NOSTRIN,Endothelial Cell
+NOTCH4,Endothelial Cell,Plasmacytoid Dendritic Cell
+NPR1,Endothelial Cell
+NPR3,Endothelial Cell
+NR5A2,Endothelial Cell
+NTS,Endothelial Cell
+PALMD,Endothelial Cell
+PCDH17,Endothelial Cell
+PDE2A,Endothelial Cell
+PECAM1,Endothelial Cell
+PHLDB2,Endothelial Cell
+PLAT,Endothelial Cell,Mast Cell
+PLVAP,Endothelial Cell
+PODXL,Endothelial Cell
+PROX1,Endothelial Cell
+RAPGEF3,Endothelial Cell
+ROBO4,Endothelial Cell
+SELP,Endothelial Cell
+SEMA3F,Endothelial Cell
+SERPINA3,Endothelial Cell
+SERPINE1,Endothelial Cell
+SFRP1,Endothelial Cell
+SHANK3,Endothelial Cell
+SLC2A1,Endothelial Cell
+SMAD1,Endothelial Cell
+SNAP25,Endothelial Cell
+SOCS2,Endothelial Cell
+SOX17,Endothelial Cell
+SOX18,Endothelial Cell
+SPHK1,Endothelial Cell
+STAB1,Endothelial Cell
+STC2,Endothelial Cell
+TACC2,Endothelial Cell
+TACR1,Endothelial Cell
+TAL1,Endothelial Cell,Mast Cell
+TEK,Endothelial Cell
+TFPI,Endothelial Cell
+THY1,Endothelial Cell
+TIE1,Endothelial Cell
+TINAGL1,Endothelial Cell
+TMEM100,Endothelial Cell
+TNFRSF6B,Endothelial Cell
+TRPM4,Endothelial Cell
+TSBP1,Endothelial Cell
+TSPAN12,Endothelial Cell
+TSPAN7,Endothelial Cell
+AIRE,Hematopoietic Stem Cell,Mature Conventional Dendritic Cell
+CCL17,Hematopoietic Stem Cell,Mature Conventional Dendritic Cell
+LAD1,Hematopoietic Stem Cell,Mature Conventional Dendritic Cell
+LAMP3,Hematopoietic Stem Cell,Mature Conventional Dendritic Cell
+AQP9,Classical Monocyte,Neutrophil
+C5AR1,Classical Monocyte,Macrophage,Intermediate Monocyte,Non Classical Monocyte
+CD300E,Classical Monocyte,CD1c+ Myeloid Dendritic Cell,Intermediate Monocyte,CD141+ Myeloid Dendritic Cell
+CLEC12A,Classical Monocyte,CD1c+ Myeloid Dendritic Cell,Intermediate Monocyte,CD141+ Myeloid Dendritic Cell,Mast Cell
+CLEC4D,Classical Monocyte,Intermediate Monocyte,Neutrophil
+CSF3R,Classical Monocyte,CD1c+ Myeloid Dendritic Cell,Macrophage,Intermediate Monocyte,Neutrophil
+CX3CR1,Classical Monocyte,CD1c+ Myeloid Dendritic Cell,Intermediate Monocyte,CD141+ Myeloid Dendritic Cell
+FCAR,Classical Monocyte,Intermediate Monocyte,Neutrophil
+FCN1,Classical Monocyte,CD1c+ Myeloid Dendritic Cell,Intermediate Monocyte
+FPR1,Classical Monocyte,Macrophage,Intermediate Monocyte
+FPR2,Classical Monocyte,Intermediate Monocyte,Neutrophil
+LILRA2,Classical Monocyte,CD1c+ Myeloid Dendritic Cell
+LILRA5,Classical Monocyte,Intermediate Monocyte,Plasmacytoid Dendritic Cell
+LILRA6,Classical Monocyte,Intermediate Monocyte
+LILRB3,Classical Monocyte,CD1c+ Myeloid Dendritic Cell,Intermediate Monocyte
+PADI4,Classical Monocyte,Neutrophil
+PTGS2,Classical Monocyte,Mast Cell
+SLC11A1,Classical Monocyte
+TREM1,Classical Monocyte
+ASPM,Regulatory T Cell
+CENPF,Regulatory T Cell
+HOPX,Regulatory T Cell
+MKI67,Regulatory T Cell
+TOP2A,Regulatory T Cell
+ADGRE2,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell,Mast Cell
+CD1B,CD1c+ Myeloid Dendritic Cell,Mature Conventional Dendritic Cell
+CD1E,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell,Mature Conventional Dendritic Cell
+CD207,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+CD300C,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+CLEC10A,CD1c+ Myeloid Dendritic Cell,Macrophage
+CLEC6A,CD1c+ Myeloid Dendritic Cell
+CLEC7A,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+CLEC9A,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+CPVL,CD1c+ Myeloid Dendritic Cell,Macrophage,CD141+ Myeloid Dendritic Cell
+HTR7,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+IL1B,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell,Non Classical Monocyte
+IL3RA,CD1c+ Myeloid Dendritic Cell,Plasmacytoid Dendritic Cell,Mature Conventional Dendritic Cell
+ITGAX,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+KCNMB1,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell,Mature Conventional Dendritic Cell
+LILRA1,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+RTN1,CD1c+ Myeloid Dendritic Cell
+TLR2,CD1c+ Myeloid Dendritic Cell,Macrophage
+TLR8,CD1c+ Myeloid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+AIM2,Memory B Cell
+CNR2,Memory B Cell
+FCRL2,Memory B Cell
+FCRLA,Memory B Cell
+SERPINA9,Memory B Cell
+TNFRSF13B,Memory B Cell
+TNR,Memory B Cell
+CD19,B Cell
+CD22,B Cell
+CD79A,B Cell
+CD79B,B Cell
+CR2,B Cell
+FCER2,B Cell
+MS4A1,B Cell
+PAX5,B Cell
+POU2AF1,B Cell
+TNFRSF13C,B Cell
+ADAMDEC1,Macrophage
+ADORA3,Macrophage
+AJAP1,Macrophage,Plasmacytoid Dendritic Cell
+AXL,Macrophage
+C3AR1,Macrophage
+CCL18,Macrophage
+CCL24,Macrophage
+CCR1,Macrophage
+CD14,Macrophage,Intermediate Monocyte
+CD163,Macrophage
+CD33,Macrophage
+CD5L,Macrophage
+CD68,Macrophage
+CETP,Macrophage
+CFP,Macrophage
+CMKLR1,Macrophage,Plasmacytoid Dendritic Cell
+COLEC12,Macrophage
+CSF1R,Macrophage
+CTSL,Macrophage
+CXCL16,Macrophage
+DAB2,Macrophage
+DMXL2,Macrophage
+ETV5,Macrophage
+F13A1,Macrophage
+FABP3,Macrophage
+FCGR2A,Macrophage
+FCGR3A,Macrophage,Mature NK T Cell
+FCGR3B,Macrophage
+FMN1,Macrophage
+FOLR2,Macrophage
+HAVCR2,Macrophage
+HMOX1,Macrophage
+HRH1,Macrophage
+IGF1,Macrophage
+IL10,Macrophage
+IL18,Macrophage
+ITGAD,Macrophage
+ITGB5,Macrophage
+KCNJ2,Macrophage
+KCNMA1,Macrophage
+LILRB2,Macrophage
+LILRB4,Macrophage,Plasmacytoid Dendritic Cell
+LILRB5,Macrophage
+LPL,Macrophage
+LRP1,Macrophage
+ME1,Macrophage
+MERTK,Macrophage
+MRC1,Macrophage
+MSR1,Macrophage
+NINJ1,Macrophage
+NXF3,Macrophage
+PDGFC,Macrophage
+PKD2L1,Macrophage
+PLA2G7,Macrophage
+PLTP,Macrophage
+PYGL,Macrophage
+RASSF4,Macrophage,Mature Conventional Dendritic Cell
+SCN9A,Macrophage,Plasmacytoid Dendritic Cell
+SIGLEC1,Macrophage
+SIGLEC7,Macrophage
+SIGLEC9,Macrophage
+SLAMF8,Macrophage,CD141+ Myeloid Dendritic Cell
+SLC16A9,Macrophage
+SLC1A3,Macrophage
+SLC2A9,Macrophage
+TGFA,Macrophage
+TLR4,Macrophage
+TRPV4,Macrophage
+VSIG4,Macrophage
+WDFY3,Macrophage
+FCGR1A,Intermediate Monocyte
+ADAM33,Stromal Cell
+ADAMTS1,Stromal Cell
+ADIPOQ,Stromal Cell
+ADRA1A,Stromal Cell
+AOX1,Stromal Cell
+ATF3,Stromal Cell
+CCN2,Stromal Cell
+COCH,Stromal Cell
+COL7A1,Stromal Cell
+FBLN5,Stromal Cell
+FHL2,Stromal Cell
+GREM1,Stromal Cell
+GRIN2B,Stromal Cell
+KCNH1,Stromal Cell
+MASP1,Stromal Cell
+MLXIPL,Stromal Cell
+NTRK2,Stromal Cell
+PLEKHH2,Stromal Cell
+PLIN1,Stromal Cell
+PLIN4,Stromal Cell
+SVEP1,Stromal Cell
+THBS2,Stromal Cell
+CD8A,Effector CD8+ αβ T Cell
+CD8B,Effector CD8+ αβ T Cell
+GZMB,Effector CD8+ αβ T Cell,Plasmacytoid Dendritic Cell,Mature NK T Cell
+BMP6,Plasma Cell
+BMP8B,Plasma Cell
+CCR2,Plasma Cell,Plasmacytoid Dendritic Cell
+CKAP4,Plasma Cell
+CTHRC1,Plasma Cell
+DERL3,Plasma Cell,Plasmacytoid Dendritic Cell
+FBXO16,Plasma Cell
+FKBP11,Plasma Cell
+IGHE,Plasma Cell
+IL5RA,Plasma Cell,Mast Cell
+KCNN3,Plasma Cell
+MANEA,Plasma Cell
+MIAT,Plasma Cell
+MKX,Plasma Cell
+MZB1,Plasma Cell
+NT5DC2,Plasma Cell
+P2RX1,Plasma Cell,Plasmacytoid Dendritic Cell,Mast Cell
+PIM2,Plasma Cell
+PRSS16,Plasma Cell
+SDF2L1,Plasma Cell
+SMOC1,Plasma Cell,Plasmacytoid Dendritic Cell,Mature Conventional Dendritic Cell
+SMPDL3B,Plasma Cell
+TNFRSF17,Plasma Cell
+TRIB1,Plasma Cell
+UGT2B17,Plasma Cell
+VDR,Plasma Cell
+AR,Plasmacytoid Dendritic Cell
+ATP13A2,Plasmacytoid Dendritic Cell
+BLNK,Plasmacytoid Dendritic Cell
+CADM4,Plasmacytoid Dendritic Cell
+CDH1,Plasmacytoid Dendritic Cell
+CLCN5,Plasmacytoid Dendritic Cell
+CLEC4C,Plasmacytoid Dendritic Cell
+CLIC3,Plasmacytoid Dendritic Cell
+CSF2RA,Plasmacytoid Dendritic Cell,CD141+ Myeloid Dendritic Cell,Mature Conventional Dendritic Cell
+CUX2,Plasmacytoid Dendritic Cell
+CXCR3,Plasmacytoid Dendritic Cell
+CYP46A1,Plasmacytoid Dendritic Cell
+DNASE1L3,Plasmacytoid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+EPHA2,Plasmacytoid Dendritic Cell
+FAAH,Plasmacytoid Dendritic Cell
+FCER1A,Plasmacytoid Dendritic Cell,Mast Cell
+FLT3,Plasmacytoid Dendritic Cell,CD141+ Myeloid Dendritic Cell,Mature Conventional Dendritic Cell
+FUT7,Plasmacytoid Dendritic Cell
+GPATCH11,Plasmacytoid Dendritic Cell
+GPR55,Plasmacytoid Dendritic Cell
+GUCY2D,Plasmacytoid Dendritic Cell
+IRF7,Plasmacytoid Dendritic Cell
+LTK,Plasmacytoid Dendritic Cell
+MAP1A,Plasmacytoid Dendritic Cell
+MED12L,Plasmacytoid Dendritic Cell
+MMP11,Plasmacytoid Dendritic Cell
+MTCL1,Plasmacytoid Dendritic Cell
+MYBL2,Plasmacytoid Dendritic Cell
+MYCL,Plasmacytoid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+NECTIN1,Plasmacytoid Dendritic Cell
+NLRP7,Plasmacytoid Dendritic Cell
+NPC1,Plasmacytoid Dendritic Cell
+NR5A1,Plasmacytoid Dendritic Cell
+P2RY1,Plasmacytoid Dendritic Cell
+P2RY6,Plasmacytoid Dendritic Cell,CD141+ Myeloid Dendritic Cell
+PHEX,Plasmacytoid Dendritic Cell
+PROC,Plasmacytoid Dendritic Cell
+PTK7,Plasmacytoid Dendritic Cell
+RASD1,Plasmacytoid Dendritic Cell
+RET,Plasmacytoid Dendritic Cell,Mast Cell
+RIMS3,Plasmacytoid Dendritic Cell
+RUNX2,Plasmacytoid Dendritic Cell
+SEMA3C,Plasmacytoid Dendritic Cell
+SIGLEC6,Plasmacytoid Dendritic Cell,Mast Cell
+SIRPB1,Plasmacytoid Dendritic Cell
+SLC7A11,Plasmacytoid Dendritic Cell,Mature Conventional Dendritic Cell
+SLC7A5,Plasmacytoid Dendritic Cell
+SMPD3,Plasmacytoid Dendritic Cell
+ST14,Plasmacytoid Dendritic Cell
+TLR7,Plasmacytoid Dendritic Cell
+TLR9,Plasmacytoid Dendritic Cell
+TRAF4,Plasmacytoid Dendritic Cell
+TRPM2,Plasmacytoid Dendritic Cell
+ZDHHC17,Plasmacytoid Dendritic Cell
+ZFAT,Plasmacytoid Dendritic Cell
+CD247,T Cell
+CD3E,T Cell
+CD3G,T Cell
+CD5,T Cell
+FLT3LG,T Cell
+FOXP3,T Cell
+IL17A,T Cell
+ACPP,CD141+ Myeloid Dendritic Cell
+ALOX15,CD141+ Myeloid Dendritic Cell
+ANPEP,CD141+ Myeloid Dendritic Cell
+BATF3,CD141+ Myeloid Dendritic Cell,Mature Conventional Dendritic Cell
+CCL22,CD141+ Myeloid Dendritic Cell,Mature Conventional Dendritic Cell
+CCND1,CD141+ Myeloid Dendritic Cell
+CD1C,CD141+ Myeloid Dendritic Cell
+CEACAM3,CD141+ Myeloid Dendritic Cell
+CLEC4A,CD141+ Myeloid Dendritic Cell
+EHF,CD141+ Myeloid Dendritic Cell,Mature Conventional Dendritic Cell
+ENPP1,CD141+ Myeloid Dendritic Cell
+FGR,CD141+ Myeloid Dendritic Cell
+HCK,CD141+ Myeloid Dendritic Cell
+HTR3A,CD141+ Myeloid Dendritic Cell
+IDO1,CD141+ Myeloid Dendritic Cell,Mature Conventional Dendritic Cell
+NR4A3,CD141+ Myeloid Dendritic Cell,Type I NK T Cell,Non Classical Monocyte,Mature Conventional Dendritic Cell
+P2RY2,CD141+ Myeloid Dendritic Cell
+PAK1,CD141+ Myeloid Dendritic Cell
+PPM1H,CD141+ Myeloid Dendritic Cell,Mast Cell
+XCR1,CD141+ Myeloid Dendritic Cell
+FGFBP2,Mature NK T Cell
+KLRC1,Mature NK T Cell
+KLRD1,Mature NK T Cell
+KLRF1,Mature NK T Cell
+NCAM1,Mature NK T Cell
+S1PR5,Mature NK T Cell
+SH2D1B,Mature NK T Cell
+ADCYAP1,Mast Cell
+ADRB2,Mast Cell
+AGAP1,Mast Cell
+BIRC7,Mast Cell
+CALB2,Mast Cell
+CMA1,Mast Cell
+CTSG,Mast Cell
+DNAH10,Mast Cell
+DRD2,Mast Cell
+EFHC2,Mast Cell
+ENPP3,Mast Cell
+ERVFRD-1,Mast Cell
+FREM1,Mast Cell
+GATA1,Mast Cell
+GATA2,Mast Cell
+GDF15,Mast Cell
+HDC,Mast Cell
+HPGD,Mast Cell
+HPGDS,Mast Cell
+HRH4,Mast Cell
+IL18R1,Mast Cell
+IL1RL1,Mast Cell
+KIT,Mast Cell
+L1CAM,Mast Cell
+LIF,Mast Cell
+MAOB,Mast Cell
+MEG3,Mast Cell
+MEIS2,Mast Cell
+MITF,Mast Cell
+MLPH,Mast Cell
+MRGPRX2,Mast Cell
+MS4A2,Mast Cell
+NTRK1,Mast Cell
+PLIN2,Mast Cell
+PTGER3,Mast Cell
+PTGS1,Mast Cell
+SCIN,Mast Cell
+SLC18A2,Mast Cell
+SYTL2,Mast Cell
+ABCC4,Mature Conventional Dendritic Cell
+ACHE,Mature Conventional Dendritic Cell
+ADAM12,Mature Conventional Dendritic Cell
+ANXA3,Mature Conventional Dendritic Cell
+AP3B2,Mature Conventional Dendritic Cell
+BCL2A1,Mature Conventional Dendritic Cell
+CCNA1,Mature Conventional Dendritic Cell
+CD80,Mature Conventional Dendritic Cell
+CD83,Mature Conventional Dendritic Cell
+CDHR1,Mature Conventional Dendritic Cell
+CDKN1A,Mature Conventional Dendritic Cell
+CDX2,Mature Conventional Dendritic Cell
+CHRNA7,Mature Conventional Dendritic Cell
+DNM1,Mature Conventional Dendritic Cell
+DSG2,Mature Conventional Dendritic Cell
+DUSP5,Mature Conventional Dendritic Cell
+EBI3,Mature Conventional Dendritic Cell
+EDIL3,Mature Conventional Dendritic Cell
+ENOX1,Mature Conventional Dendritic Cell
+ETV3,Mature Conventional Dendritic Cell
+GADD45A,Mature Conventional Dendritic Cell
+GADD45G,Mature Conventional Dendritic Cell
+GCGR,Mature Conventional Dendritic Cell
+GRIN1,Mature Conventional Dendritic Cell
+HAS2,Mature Conventional Dendritic Cell
+HELLS,Mature Conventional Dendritic Cell
+ICAM4,Mature Conventional Dendritic Cell
+ICOSLG,Mature Conventional Dendritic Cell
+IGSF3,Mature Conventional Dendritic Cell
+IL12B,Mature Conventional Dendritic Cell
+IL15,Mature Conventional Dendritic Cell
+IL23R,Mature Conventional Dendritic Cell
+INSM1,Mature Conventional Dendritic Cell
+ITIH1,Mature Conventional Dendritic Cell
+KLF5,Mature Conventional Dendritic Cell
+LAMB3,Mature Conventional Dendritic Cell
+MELTF,Mature Conventional Dendritic Cell
+MST1R,Mature Conventional Dendritic Cell
+NAV1,Mature Conventional Dendritic Cell
+NGFR,Mature Conventional Dendritic Cell
+NIBAN1,Mature Conventional Dendritic Cell
+NOS1,Mature Conventional Dendritic Cell
+NRP2,Mature Conventional Dendritic Cell
+NTN1,Mature Conventional Dendritic Cell
+PC,Mature Conventional Dendritic Cell
+PDLIM4,Mature Conventional Dendritic Cell
+PLXNC1,Mature Conventional Dendritic Cell
+PNMA2,Mature Conventional Dendritic Cell
+PRAME,Mature Conventional Dendritic Cell
+PRODH,Mature Conventional Dendritic Cell
+PTGIR,Mature Conventional Dendritic Cell
+PVR,Mature Conventional Dendritic Cell
+RAB9A,Mature Conventional Dendritic Cell
+RELN,Mature Conventional Dendritic Cell
+ROR2,Mature Conventional Dendritic Cell
+SDC4,Mature Conventional Dendritic Cell
+SGCA,Mature Conventional Dendritic Cell
+SLC1A2,Mature Conventional Dendritic Cell
+SLC6A12,Mature Conventional Dendritic Cell
+SNX11,Mature Conventional Dendritic Cell
+SRCIN1,Mature Conventional Dendritic Cell
+SSTR2,Mature Conventional Dendritic Cell
+STRIP2,Mature Conventional Dendritic Cell
+TFPI2,Mature Conventional Dendritic Cell
+TNFRSF11A,Mature Conventional Dendritic Cell
+TNFRSF11B,Mature Conventional Dendritic Cell
+TNFRSF8,Mature Conventional Dendritic Cell
+TNFRSF9,Mature Conventional Dendritic Cell
+TNNT2,Mature Conventional Dendritic Cell
+TUBB2A,Mature Conventional Dendritic Cell
+TUBB2B,Mature Conventional Dendritic Cell
+TUBB6,Mature Conventional Dendritic Cell
+UPK3A,Mature Conventional Dendritic Cell
+WNT5A,Mature Conventional Dendritic Cell
+SLC4A1,Erythrocyte
+SNCA,Erythrocyte
+CXCR1,Neutrophil
+MGAM,Neutrophil
+RORC,Th17 Cell
+GATA3,Th2 Cell
