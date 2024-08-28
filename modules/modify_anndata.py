@@ -207,7 +207,7 @@ def add_genomic_positions(adata):
 
     
     # Load the gene positions data
-    gene_file = os.path.expanduser("~/SSS_mount/insituCNV/Ensmbl_BioMart_gene_info.txt")
+    gene_file = os.path.expanduser("~/SSS_mount/insituCNV/InSituCNV/Ensmbl_BioMart_gene_info.txt")
     gene_positions_df = pd.read_csv(gene_file)
 
     # Create a dictionary for quick lookup
