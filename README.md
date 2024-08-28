@@ -6,7 +6,7 @@ Temporary README for project structure:
 
 Data types:
 - CosMX data
-- Xenium data
+- Xenium data (prostate, kidney, skin)
 
 
 ## Figure 2 - Simulated Data (test technical limitations)
