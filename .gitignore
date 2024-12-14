@@ -1,5 +1,8 @@
 #Data downloaded from 10X genomics, the lymph node xenium 5K dataset
 
+# All jupyter checkpoint files
+.ipynb_checkpoints/
+
 
 # From the Human Lymph Node
 Load_datasets/Lymph_Node/Xenium_Prime_Human_Lymph_Node_Reactive_FFPE_outs
