@@ -3,6 +3,16 @@
 # All jupyter checkpoint files
 .ipynb_checkpoints/
 
+# All python compiled files
+__pycache__/
+*.pyc
+
+# All .h5ad files
+*.h5ad
+
+
+
+
 
 # From the Human Lymph Node
 Load_datasets/Lymph_Node/Xenium_Prime_Human_Lymph_Node_Reactive_FFPE_outs
