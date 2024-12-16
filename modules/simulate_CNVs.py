@@ -141,10 +141,9 @@ def simulate_cnvs(adata, cnv_template_df, subclone_dict):
 
     """
 
-
     
     # Step 1: Create a new layer in adata to store the simulated CNV data
-    adata.layers['CNV_simulated'] = adata.X.copy()
+    adata.layers['CNV_simulated'] = adata.layers['counts'].copy()
 
     # Step 2: Randomly assign cells to subclones based on subclone_dict
     num_cells = adata.shape[0]
