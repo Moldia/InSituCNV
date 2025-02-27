@@ -4,7 +4,7 @@
 .ipynb_checkpoints/
 
 # All python compiled files
-__pycache__/
+#__pycache__/
 **/*.pyc
 **/*.pyo
 
@@ -12,12 +12,10 @@ __pycache__/
 # All .h5ad files
 *.h5ad
 
-# Ignore all PNG and PDF files inside 'figures' directories
-**/figures/**/*.png
-**/figures/**/*.pdf
-**/figures_old/**/*.png
-**/figures_old/**/*.pdf
-
+# Ignore all PNG and PDF files
+**/*.png
+**/*.pdf
+**/*.csv
 
 # Ignore Windows system files
 Thumbs.db
