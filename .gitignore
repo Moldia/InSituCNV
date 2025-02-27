@@ -5,13 +5,22 @@
 
 # All python compiled files
 __pycache__/
-*.pyc
+**/*.pyc
+**/*.pyo
+
 
 # All .h5ad files
 *.h5ad
 
+# Ignore all PNG and PDF files inside 'figures' directories
+**/figures/**/*.png
+**/figures/**/*.pdf
+**/figures_old/**/*.png
+**/figures_old/**/*.pdf
 
 
+# Ignore Windows system files
+Thumbs.db
 
 
 # From the Human Lymph Node
