@@ -8,9 +8,11 @@
 **/*.pyc
 **/*.pyo
 
-
+# .RData files
+**/*.RData
+**/*.Rhistory
 # All .h5ad files
-*.h5ad
+**/*.h5ad
 
 # Ignore all PNG and PDF files
 **/*.png
