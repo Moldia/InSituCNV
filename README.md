@@ -7,7 +7,7 @@ link:
 ## Data avaliability
 Raw data of the CosMX WT experiments in CRC samples included in this work can be downloaded from **ADD LINK**. The 10X Xenium prime datasets used in this study are publically avaliable at the following link: **ADD LINK**. The 10X scRNA-seq dataset used for CNV simulation is avaliable at **ADD LINK**.
 
-From Cowell, L.G., Pascual Reguant, A., Heyn, H., *et al.* (2025). *[Title of the preprint]*. bioRxiv.:
+From Crowell, H., Pascual Reguant, A., Heyn, H., *et al.* (2025). *[Title of the preprint]*. bioRxiv.:
 - CosMx WTx: **ADD LINK**
 - snPATHO-seq: **ADD LINK**
 
