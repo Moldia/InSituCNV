@@ -1,59 +1,56 @@
-
 # Load necessary libraries
-library(dplyr)
-library(HDF5Array)
-library(zellkonverter)
-library(stringr)
+library(dplyr)           
+library(HDF5Array)       
+library(zellkonverter)  
+library(stringr)       
 
 
+###------------------------------------------------------
+### Save the raw SCE as an AnnData object (.h5ad file)
 
-
-### Save the cluster annotations as metadata for each sample 
-
-for (SID in c(
-  '210'
-  #'110',
-  #'120'
-  #'221', 
-  #'222', 
- # '231', 
- # '232', 
-  #'242',
-  #'210
-  )){
-  lv1 <- readRDS(paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/lv1-",SID,".rds"))
-  cluster_metadata <- as.data.frame(lv1[["clust"]])
-  write.csv(cluster_metadata, paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/",SID,"/cluster_metadata.csv"))
-}
-
-
-
-#_____________________________________________________
-
-
-### Save the raw SCE as an AnnData object .h5ad file
-
+# Define paths to raw HDF5-based SummarizedExperiment objects
 raw_paths <- c(
   #"~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-110-20241210T191725Z-001/raw-110",
   #"~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-120-20241210T191724Z-002/raw-120"
-  #"~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-221-20241111T094332Z-001/raw-221",
+  "~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-221-20241111T094332Z-001/raw-221",
   #"~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-222-20241111T094333Z-001/raw-222",
   #"~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-231-20241111T095538Z-001/raw-231",
   #"~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-232-20241108T073407Z-001/raw-232",
   #"~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-242-20241108T073409Z-001/raw-242",
   #"~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-210-20250331T141016Z-001/raw-210",
-  "~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-241-20250408T192509Z-001/raw-241"
+  #"~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/raw-241-20250408T192509Z-001/raw-241"
 )
 
-for (path_obj in raw_paths){
+# Iterate through each path object
+for (path_obj in raw_paths) {
+  # Extract sample ID (last 3 characters of the path)
   SID <- str_sub(path_obj, -3)
-  #sce_from_h5 <- HDF5Array::loadHDF5SummarizedExperiment(path_obj)
-  h5ad_path = paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/",SID,"/adata_",SID,"_raw.h5ad")
-  writeH5AD(HDF5Array::loadHDF5SummarizedExperiment(path_obj), 
-            file=h5ad_path)
+  
+  # Define output path for the .h5ad file
+  h5ad_path = paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/", SID, "/adata_", SID, "_raw.h5ad")
+  
+  # Load the HDF5-based SummarizedExperiment and save it as a .h5ad file
+  writeH5AD(HDF5Array::loadHDF5SummarizedExperiment(path_obj), file = h5ad_path)
 }
 
-### Save ROI healthy cell annotations
+
+###------------------------------------------------------
+### Save the filtered cells' cluster annotations as metadata for each sample
+
+# Loop through specified sample ID
+for (SID in c('221')) {
+  # Load level 1 clustering RDS file for the sample
+  lv1 <- readRDS(paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/lv1-", SID, ".rds"))
+  
+  # Extract clustering information and convert to data frame
+  cluster_metadata <- as.data.frame(lv1[["clust"]])
+  
+  # Save the cluster metadata as a CSV file within the sample directory
+  write.csv(cluster_metadata, paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/", SID, "/cluster_metadata.csv"))
+}
+
+###------------------------------------------------------
+### Extract and save per-sample healthy ROI (REF) annotations
 
 ROI <- readRDS("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/roi.rds")
 
@@ -75,109 +72,55 @@ for (SID in c(
 }
 
 
+###------------------------------------------------------
+### Extract and save per-sample ROI (REF, TVA1-3, CRC) annotations
 
-
-#_____________________________________________________
-
-### Extracting the ROI (REF, TVA, CRC) for each sample
-
+# Load RDS file mapping samples to ROI-associated cell IDs
 ROI <- readRDS("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/cells_by_sid_roi.rds")
 
-# Initialize an empty list to store data frames for each sample
+# Initialize a list to store output data frames for each sample
 sample_data_frames <- list()
 
-# Loop through each sample in the RDS data
+# Loop over all samples in the ROI object
 for (sample in names(ROI)) { 
   sample_rois <- ROI[[sample]]
   
-  # Initialize a data frame to hold cell IDs and their associated ROIs
+  # Prepare an empty data frame for this sample
   sample_df <- data.frame()
   
-  # Loop through each ROI for the sample
+  # Iterate over each ROI within the sample
   for (roi in names(sample_rois)) {
-    # Extract the cell IDs for the current ROI
+    # Get cell IDs associated with the current ROI
     cell_ids <- sample_rois[[roi]]
     
-    # Modify the ROI name to keep only the part after the first underscore
-    roi<- sub("^[^_]*_", "", roi)
+    # Simplify ROI label by removing text before the first underscore
+    roi <- sub("^[^_]*_", "", roi)
     
-    # Create a data frame with cell IDs as row names and the ROI as a column
+    # Create a data frame with cell IDs and corresponding ROI label
     roi_df <- data.frame(ROI = rep(roi, length(cell_ids)), row.names = cell_ids)
     
-    # Append to the sample's data frame
+    # Append to the cumulative sample data frame
     sample_df <- rbind(sample_df, roi_df)
   }
   
-  # Store the sample's data frame in the list
+  # Save the sample's ROI annotation to list and CSV
   sample_data_frames[[sample]] <- sample_df
-  
-  # Write the sample's data frame to a CSV file
-  write.csv(sample_df, paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/",sample, "/",sample,"_ROI.csv"), row.names = TRUE)
+  write.csv(sample_df, paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/", sample, "/", sample, "_ROI.csv"), row.names = TRUE)
 }
 
-#_____________________________________________________
 
-### Extracting the epi ROI (REF, TVA, CRC) for each sample
+###------------------------------------------------------
+### Convert the features list to a CSV files
 
-ROI_epi <- readRDS("~/SSS_mount/augusta/insituCNV/data/WTx-CosMx_TVA/round2/epi_by_sid_by_roi.rds")
-
-# Initialize an empty list to store data frames for each sample
-sample_data_frames <- list()
-
-# Loop through each sample in the RDS data
-for (sample in names(ROI)) { 
-  sample_rois <- ROI_epi[[sample]]
-  
-  # Initialize a data frame to hold cell IDs and their associated ROIs
-  sample_df <- data.frame()
-  
-  # Loop through each ROI for the sample
-  for (roi in names(sample_rois)) {
-    # Extract the cell IDs for the current ROI
-    cell_ids <- sample_rois[[roi]]
-    
-    # Modify the ROI name to keep only the part after the first underscore
-    roi<- sub("^[^_]*_", "", roi)
-    
-    # Create a data frame with cell IDs as row names and the ROI as a column
-    roi_df <- data.frame(ROI = rep(roi, length(cell_ids)), row.names = cell_ids)
-    
-    # Append to the sample's data frame
-    sample_df <- rbind(sample_df, roi_df)
-  }
-  
-  # Store the sample's data frame in the list
-  sample_data_frames[[sample]] <- sample_df
-  
-  # Write the sample's data frame to a CSV file
-  write.csv(sample_df, paste0("~/SSS_mount/augusta/insituCNV/data/WTx-CosMx_TVA/round2/",sample, "/",sample,"_epi_ROI.csv"), row.names = TRUE)
-}
-
-# For the lymph node metastasis
-
-epi_241 <- readRDS("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/epi-241.rds")
-epi_241_df <- as.data.frame(epi_241)
-write.csv(epi_241_df, paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/241/epi-241.csv"))
-
-
-
-
-#_____________________________________________________
-
-
-
-## Covert the features to csv
-features_all <- readRDS("~/SSS_mount/augusta/insituCNV/data/WTx-CosMx_TVA/round2/features_all.rds")
+features_all <- readRDS("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/features_all.rds")
 features_all_df <- as.data.frame(features_all)
-write.csv(features_all_df, paste0("~/SSS_mount/augusta/insituCNV/data/WTx-CosMx_TVA/round2/features_all.csv"))
+write.csv(features_all_df, paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/features_all.csv"))
 
-
-features_epi <- readRDS("~/SSS_mount/augusta/insituCNV/data/WTx-CosMx_TVA/round2/features_epi.rds")
+features_epi <- readRDS("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/features_epi.rds")
 features_epi_df <- as.data.frame(features_epi)
-write.csv(features_epi_df, paste0("~/SSS_mount/augusta/insituCNV/data/WTx-CosMx_TVA/round2/features_epi.csv"))
+write.csv(features_epi_df, paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/features_epi.csv"))
 
-epi_gs <- readRDS("~/SSS_mount/augusta/insituCNV/data/WTx-CosMx_TVA/round2/epi_gs.rds")
+epi_gs <- readRDS("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/epi_gs.rds")
 epi_gs_df <- as.data.frame(epi_gs)
-write.csv(epi_gs_df, paste0("~/SSS_mount/augusta/insituCNV/data/WTx-CosMx_TVA/round2/epi_gs.csv"))
-
+write.csv(epi_gs_df, paste0("~/storage3/insituCNV/data/WTx-CosMx_TVA/round2/epi_gs.csv"))
 
