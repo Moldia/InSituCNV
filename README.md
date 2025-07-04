@@ -3,54 +3,20 @@ This is a public repository to reproduce the analysis in the manusctipt ***In Si
 
 link: 
 
-***
-## Data avaliability
-Raw data of the CosMX WT experiments in CRC samples included in this work can be downloaded from **ADD LINK**. The 10X Xenium prime datasets used in this study are publically avaliable at the following link: **ADD LINK**. The 10X scRNA-seq dataset used for CNV simulation is avaliable at **ADD LINK**.
-
-From Crowell, H., Pascual Reguant, A., Heyn, H., *et al.* (2025). *[Title of the preprint]*. bioRxiv.:
-- CosMx WTx: **ADD LINK**
-- snPATHO-seq: **ADD LINK**
-
-From 10X publically avaliable datasets:
-- Xenium prime (Ovarian): **ADD LINK**
-- Xenium prime (lymph node): **ADD LINK**
-- scRNAseq (lung organoid): **ADD LINK**
-
-The data is avalible 
-
 *** 
-## Folder structure
-These folders contains all R script and notebooks necessary to reproduce the analysis in this study. For simplicity, they are organized in the same order as they are presented in the manuscipt.
+## Code and Data Avaliability
+These folders contains all R script and notebooks necessary to reproduce the analysis in this study. For simplicity, they are organized in the same order as they are presented in the manuscipt. 
 
 ### Figure 1
-- Figure 1 - CosMx and snPATHO-seq (Colorectal cancer)
-  - 1_R_convert_from_SCE_extract_metadata
-  - 2_Prepare_data
-  - 3_inferCNV
-  - 4_Compare
-- Figure 1 - Xenium prime (Ovarian cancer)
-  - 01_
-  - 02_
-  - 03_
-  - 04_
-- Figure 1 - Xenium prime (Lymph node)
-  - 1_Cell_typing_lymphnode.ipynb
-  - 2_infercnv_lymphnode_moments.ipynb
+#### CosMx_CRC
+Includes the analysis performed on the CosMx and snPATHO-seq datasets from colorectal tumor sample 221, avaliable in Crowell et al., "*Tracing colorectal malignancy transformation from cell to tissue scale*", bioRxiv (2025) https://doi.org/10.1101/2025.06.23.660674.
+#### Xenium_prime_ovarian
+Contains analysis of the publicly available high-grade ovarian cancer Xenium Prime dataset from 10x Genomics: https://www.10xgenomics.com/datasets/xenium-prime-fresh-frozen-human-ovary.
+#### Xenium_prime_lymph_node
+Contains analysis of the publicly available lymph node Xenium Prime dataset from 10x Genomics: https://www.10xgenomics.com/datasets/preview-data-xenium-prime-gene-expression.
 
 ### Figure 2
-- 00_Load_simulation_dataset
-- 01_Simulate_CNVs
-- 02_Apply_technical_variations
-- 03_Run_inferCNV
-- 04_Compare_results_using_metrics
-- 05_Visualize_results
-
-### insitucnv
-Package containing the functions used in this study. 
-
-
-### data (?)
-Location of the input data files necessary to run the analysis. Intermediate data files have to be generated from the input files. 
+This folder contains the code used to assess the technical limitations of CNV inference, as presented in Figure 2 of the manuscript "In Situ Inference of Copy Number Variations in Image-Based Spatial Transcriptomics". The 10x scRNA-seq dataset used for CNV simulation is available at: https://cellxgene.cziscience.com/collections/e9cf4e8d-05ed-4d95-b550-af35ca219390.
 
 
 
