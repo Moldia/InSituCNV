@@ -97,9 +97,8 @@ def inferCNV_for_simulated_data(path, data_name, window_size):
 
 
 
-
 def save_figures(path, data_name):
-        '''
+    '''
     Loads a CNV-inferred AnnData object and generates visualizations of CNV heatmaps and UMAPs,
     saving them as PDF files.
 
@@ -109,31 +108,33 @@ def save_figures(path, data_name):
 
     Returns:
         None
-        '''
+    '''
 
     # Load the dataset from the specified path
     adata = sc.read_h5ad(path + '/' + data_name + '_CNVinf.h5ad')
 
-    cnv_leiden_colors = ["#df9a57","#fc7a57","#fcd757","#a22020"]
-    simulated_subclone_colors = ["#bce784","#5dd39e","#348aa7","#525174"]
-    
+    cnv_leiden_colors = ["#df9a57", "#fc7a57", "#fcd757", "#a22020"]
+    simulated_subclone_colors = ["#bce784", "#5dd39e", "#348aa7", "#525174"]
+
     # Assign custom colors to the respective categories
     adata.uns["cnv_leiden_colors"] = cnv_leiden_colors
     adata.uns["simulated_subclone_colors"] = simulated_subclone_colors
-    
+
     # Generate and save a CNV heatmap
     cnv.pl.chromosome_heatmap(
         adata,
-        groupby="cnv_leiden",  # Group cells by inferred CNV clusters
-        dendrogram=False,  # Do not plot a dendrogram
-        vmin=-0.4, vmax=0.4,  # Set color range for CNV values
+        groupby="cnv_leiden",
+        dendrogram=False,
+        vmin=-0.4, vmax=0.4,
         save=f'_{data_name}.pdf'
     )
     print('CNV heatmap saved!')
 
+    # Generate and save UMAP plots
     cnv.pl.umap(
         adata,
-        color=[ 'cnv_leiden','simulated_subclone'],  # Colors for UMAP plots
+        color=['cnv_leiden', 'simulated_subclone'],
         save=f'_{data_name}.pdf'
     )
     print('CNV UMAP saved!')
+
