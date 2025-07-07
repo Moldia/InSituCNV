@@ -1,5 +1,5 @@
 # InSituCNV
-This is a public repository to reproduce the analysis in the manusctipt ***In Situ* Inference of Copy Number Variations in Image-Based Spatial Transcriptomics** by Jensen et al., https://doi.org/10.1101/2025.07.02.662761.
+This is a public repository to reproduce the analysis in the manusctipt ***In Situ* Inference of Copy Number Variations in Image-Based Spatial Transcriptomics** by Jensen et al., bioRxiv (2025), https://doi.org/10.1101/2025.07.02.662761.
 
 *** 
 ## Code and Data Avaliability
