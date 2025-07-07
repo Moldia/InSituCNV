@@ -22,16 +22,3 @@
 # Ignore Windows system files
 Thumbs.db
 
-
-# From the Human Lymph Node
-Load_datasets/Lymph_Node/Xenium_Prime_Human_Lymph_Node_Reactive_FFPE_outs
-Load_datasets/Lymph_Node/Xenium_HumanLymphNode_5K.h5ad
-Load_datasets/Lymph_Node/Xenium_Prime_Human_Lymph_Node_Reactive_FFPE_cell_types.csv
-Load_datasets/Lymph_Node/Xenium_Prime_Human_Lymph_Node_Reactive_FFPE_gene_groups.csv
-
-# From the Prostate Adenocarcinoma
-Load_datasets/Prostate_Adenocarcinoma/Xenium_Prime_Human_Prostate_FFPE_outs
-Load_datasets/Prostate_Adenocarcinoma/Xenium_ProstateAdenocarcinoma_5K.h5ad
-
-# From the Skin Melanoma 
-Load_datasets/Skin_Melanoma/Xenium_Prime_Human_Skin_FFPE_outs
