@@ -30,7 +30,7 @@ Navigate to the directory:
 
 Create and activate a conda environment including all necessary dependencies:
 
-```conda env create --name insituCNV_env --file=insitucnv.yml```
+```conda env create --name insituCNV_env --file=insitucnv_env.yml```
 
 ```conda activate insituCNV_env```
 
