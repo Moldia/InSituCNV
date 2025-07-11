@@ -1,4 +1,0 @@
-name: insitucnv
-channels:
-  - defaults
-prefix: /home/sergio/anaconda3/envs/insitucnv
