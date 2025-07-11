@@ -1,6 +1,6 @@
 ## R Dependencies
 
-This project uses R version **4.5.1** with the following core packages:
+This part uses R version **4.5.1** with the following core packages:
 
 - `dplyr`
 - `stringr`
