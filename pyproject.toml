@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "insitucnv"
+version = "0.1.0"
+description = "Reusable tools for in situ CNV inference in image-based spatial transcriptomics."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Augusta" }
+]
+dependencies = [
+  "anndata>=0.10,<0.12",
+  "infercnvpy>=0.6.0",
+  "igraph>=0.11",
+  "leidenalg>=0.10",
+  "matplotlib>=3.8",
+  "numpy>=1.26",
+  "pandas>=2.1",
+  "scanpy>=1.10",
+  "scikit-learn>=1.4",
+  "scipy>=1.11",
+  "scvelo>=0.3.3",
+  "seaborn>=0.13",
+  "tqdm>=4.66"
+]
+
+[project.scripts]
+insitucnv = "insitucnv.cli:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["insitucnv*"]

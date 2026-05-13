@@ -1,0 +1,31 @@
+__pycache__/
+*.py[cod]
+*.so
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+.DS_Store
+
+# Local analysis outputs
+data/
+results/
+plots/
+output/
+*.h5ad
+*.h5
+*.loom
+*.rds
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.svg
+
+# Local duplicate/editor files
+README copy.md

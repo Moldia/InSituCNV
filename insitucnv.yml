@@ -1,0 +1,24 @@
+name: insitucnv_env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11
+  - pip
+  - anndata>=0.10,<0.12
+  - h5py
+  - jupyterlab
+  - matplotlib>=3.8
+  - numpy>=1.26
+  - pandas>=2.1
+  - pybiomart
+  - python-igraph
+  - leidenalg
+  - scanpy>=1.10
+  - scikit-learn>=1.4
+  - scipy
+  - scvelo>=0.3.3
+  - seaborn>=0.13
+  - tqdm
+  - pip:
+      - infercnvpy>=0.6.0

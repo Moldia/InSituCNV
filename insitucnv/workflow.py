@@ -1,0 +1,201 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import pandas as pd
+
+from insitucnv.analysis import find_optimal_clustering
+from insitucnv.pl import plot_chromosome_heatmap, plot_embedding, plot_spatial
+from insitucnv.tl import (
+    assign_cnv_status,
+    calculate_cnv_burden,
+    cluster_cnv_resolutions,
+    compute_cnv_neighbors,
+    export_mean_cnv_per_gene,
+    prepare_cnv_input,
+    run_infercnv,
+)
+
+
+REFERENCE_PRIORITY = ["T_cells", "B_cells", "Myeloid", "Plasma", "Fibroblast", "Endothelial", "Adipocytes", "PVLs"]
+
+
+def resolve_reference_categories(adata, reference_key: str, priority: list[str] | None = None) -> list[str]:
+    """Choose non-tumor reference categories for inferCNV."""
+    if reference_key not in adata.obs:
+        raise KeyError(f"adata.obs['{reference_key}'] not found.")
+    present = set(adata.obs[reference_key].astype(str).unique())
+    selected = [label for label in (priority or REFERENCE_PRIORITY) if label in present]
+    if selected:
+        return selected
+    fallback = sorted(label for label in present if label.lower() not in {"epithelial", "tumor", "unknown"})
+    if fallback:
+        return fallback
+    raise ValueError(f"Could not determine inferCNV reference categories from '{reference_key}'.")
+
+
+def select_best_resolution(metrics: pd.DataFrame) -> float:
+    """Select a Leiden resolution from the metrics returned by ``find_optimal_clustering``."""
+    if metrics.empty:
+        raise ValueError("No valid clustering resolutions were evaluated.")
+
+    ranked = metrics.copy()
+    ranked["db_inverted"] = -ranked["davies_bouldin_score"]
+    metric_cols = ["silhouette_score", "stability_score", "spatial_cohesion_score", "db_inverted"]
+    for col in metric_cols:
+        std = ranked[col].std()
+        ranked[f"{col}_z"] = 0.0 if pd.isna(std) or std == 0 else (ranked[col] - ranked[col].mean()) / std
+    ranked["combined_score"] = ranked[[f"{col}_z" for col in metric_cols]].sum(axis=1)
+    best = ranked.sort_values(["combined_score", "stability_score", "silhouette_score"], ascending=False).iloc[0]
+    return float(best["resolution"])
+
+
+def _json_ready(value):
+    if isinstance(value, np.generic):
+        return value.item()
+    if isinstance(value, Path):
+        return str(value)
+    return value
+
+
+def run_insitucnv(
+    adata,
+    output_dir: str | Path,
+    reference_key: str,
+    reference_categories: list[str] | None = None,
+    raw_layer: str = "raw_counts",
+    target_sum: float | None = 1e4,
+    smoothing_neighbors: int = 100,
+    smoothing_mode: str = "connectivities",
+    window_size: int = 60,
+    step: int = 10,
+    lfc_clip: float = 4.0,
+    chunksize: int = 1000,
+    cluster_resolutions: list[float] | None = None,
+    primary_resolution: float | None = None,
+    select_resolution_by_metrics: bool = False,
+    evaluate_resolution_metrics: bool = False,
+    spatial_key: str = "spatial",
+    point_size: float = 4.0,
+    run_umap: bool = False,
+    save_intermediate: bool = True,
+    copy: bool = True,
+    **infercnv_kwargs: Any,
+) -> dict[str, Any]:
+    """Run the complete InSituCNV workflow on a prepared AnnData object.
+
+    The input AnnData should contain raw counts in ``raw_layer`` or in ``X``,
+    reference labels in ``adata.obs[reference_key]``, a neighbor graph for
+    smoothing, and spatial coordinates in ``adata.obsm[spatial_key]`` if spatial
+    plots are requested.
+    """
+    out = adata.copy() if copy else adata
+    output_dir = Path(output_dir)
+    plots_dir = output_dir / "plots"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    plots_dir.mkdir(parents=True, exist_ok=True)
+
+    cluster_resolutions = cluster_resolutions or [0.1, 0.2, 0.3]
+    if save_intermediate:
+        out.write(output_dir / "adata_input.h5ad", compression="gzip")
+
+    out = prepare_cnv_input(
+        out,
+        raw_layer=raw_layer,
+        target_sum=target_sum,
+        smoothing_neighbors=smoothing_neighbors,
+        smoothing_mode=smoothing_mode,
+        copy=False,
+    )
+    reference_categories = reference_categories or resolve_reference_categories(out, reference_key)
+
+    run_infercnv(
+        out,
+        reference_key=reference_key,
+        reference_categories=reference_categories,
+        window_size=window_size,
+        step=step,
+        lfc_clip=lfc_clip,
+        chunksize=chunksize,
+        **infercnv_kwargs,
+    )
+    compute_cnv_neighbors(out, run_umap=run_umap)
+    cluster_keys = cluster_cnv_resolutions(out, cluster_resolutions, dendrogram=True)
+
+    metrics = pd.DataFrame()
+    if evaluate_resolution_metrics or select_resolution_by_metrics:
+        metrics = find_optimal_clustering(out, resolutions=cluster_resolutions, spatial_key=spatial_key)
+        metrics.to_csv(output_dir / "cluster_resolution_metrics.csv", index=False)
+
+    if select_resolution_by_metrics and not metrics.empty:
+        primary_resolution = select_best_resolution(metrics)
+    if primary_resolution is not None:
+        primary_cluster_key = f"cnv_leiden_res{float(primary_resolution):g}"
+    else:
+        primary_cluster_key = cluster_keys[0]
+
+    calculate_cnv_burden(out)
+    assign_cnv_status(out, primary_cluster_key)
+
+    for key in cluster_keys:
+        plot_chromosome_heatmap(out, groupby=key, output_path=plots_dir / f"{key}_heatmap.png")
+        if spatial_key in out.obsm:
+            plot_spatial(
+                out,
+                color=key,
+                output_path=plots_dir / f"{key}_spatial.png",
+                spatial_key=spatial_key,
+                point_size=point_size,
+                title=f"Spatial {key}",
+            )
+
+    if spatial_key in out.obsm:
+        plot_spatial(
+            out,
+            color="cnv_status",
+            output_path=plots_dir / "cnv_status_spatial.png",
+            spatial_key=spatial_key,
+            point_size=point_size,
+            title="Spatial CNV status",
+        )
+    if run_umap and "X_umap" in out.obsm:
+        plot_embedding(out, color=[reference_key, primary_cluster_key], output_path=plots_dir / "umap_cnv_clusters.png")
+
+    mean_cnv_path = None
+    if "gene_values_cnv" in out.layers:
+        mean_cnv_path = output_dir / "tumor_mean_cnv_per_gene.tsv"
+        export_mean_cnv_per_gene(out, mean_cnv_path)
+
+    output_h5ad = output_dir / "adata_cnv.h5ad"
+    out.write(output_h5ad, compression="gzip")
+
+    summary = {
+        "n_cells": int(out.n_obs),
+        "n_genes": int(out.n_vars),
+        "reference_key": reference_key,
+        "reference_categories": reference_categories,
+        "raw_layer": raw_layer,
+        "target_sum": target_sum,
+        "smoothing_neighbors": smoothing_neighbors,
+        "smoothing_mode": smoothing_mode,
+        "window_size": window_size,
+        "step": step,
+        "lfc_clip": lfc_clip,
+        "cluster_resolutions": cluster_resolutions,
+        "cluster_keys": cluster_keys,
+        "primary_cluster_key": primary_cluster_key,
+        "output_h5ad": output_h5ad,
+        "mean_cnv_per_gene": mean_cnv_path,
+    }
+    (output_dir / "run_summary.json").write_text(json.dumps(summary, indent=2, default=_json_ready))
+
+    return {
+        "adata": out,
+        "cluster_keys": cluster_keys,
+        "primary_cluster_key": primary_cluster_key,
+        "metrics": metrics,
+        "summary": summary,
+    }
