@@ -8,13 +8,10 @@ import numpy as np
 import pandas as pd
 
 from insitucnv.analysis import find_optimal_clustering
-from insitucnv.pl import plot_chromosome_heatmap, plot_embedding, plot_spatial
+from insitucnv.pl import plot_chromosome_heatmap, plot_spatial
 from insitucnv.tl import (
-    assign_cnv_status,
-    calculate_cnv_burden,
     cluster_cnv_resolutions,
     compute_cnv_neighbors,
-    export_mean_cnv_per_gene,
     prepare_cnv_input,
     run_infercnv,
 )
@@ -80,17 +77,17 @@ def run_insitucnv(
     evaluate_resolution_metrics: bool = False,
     spatial_key: str = "spatial",
     point_size: float = 4.0,
-    run_umap: bool = False,
     save_intermediate: bool = True,
     copy: bool = True,
     **infercnv_kwargs: Any,
 ) -> dict[str, Any]:
-    """Run the complete InSituCNV workflow on a prepared AnnData object.
+    """Run the core InSituCNV workflow on a prepared AnnData object.
 
     The input AnnData should contain raw counts in ``raw_layer`` or in ``X``,
     reference labels in ``adata.obs[reference_key]``, a neighbor graph for
     smoothing, and spatial coordinates in ``adata.obsm[spatial_key]`` if spatial
-    plots are requested.
+    plots are requested. Tumor/normal and clone labels are intentionally left to
+    downstream manual annotation after the heatmap and spatial plots are reviewed.
     """
     out = adata.copy() if copy else adata
     output_dir = Path(output_dir)
@@ -122,7 +119,7 @@ def run_insitucnv(
         chunksize=chunksize,
         **infercnv_kwargs,
     )
-    compute_cnv_neighbors(out, run_umap=run_umap)
+    compute_cnv_neighbors(out)
     cluster_keys = cluster_cnv_resolutions(out, cluster_resolutions, dendrogram=True)
 
     metrics = pd.DataFrame()
@@ -137,9 +134,6 @@ def run_insitucnv(
     else:
         primary_cluster_key = cluster_keys[0]
 
-    calculate_cnv_burden(out)
-    assign_cnv_status(out, primary_cluster_key)
-
     for key in cluster_keys:
         plot_chromosome_heatmap(out, groupby=key, output_path=plots_dir / f"{key}_heatmap.png")
         if spatial_key in out.obsm:
@@ -151,23 +145,6 @@ def run_insitucnv(
                 point_size=point_size,
                 title=f"Spatial {key}",
             )
-
-    if spatial_key in out.obsm:
-        plot_spatial(
-            out,
-            color="cnv_status",
-            output_path=plots_dir / "cnv_status_spatial.png",
-            spatial_key=spatial_key,
-            point_size=point_size,
-            title="Spatial CNV status",
-        )
-    if run_umap and "X_umap" in out.obsm:
-        plot_embedding(out, color=[reference_key, primary_cluster_key], output_path=plots_dir / "umap_cnv_clusters.png")
-
-    mean_cnv_path = None
-    if "gene_values_cnv" in out.layers:
-        mean_cnv_path = output_dir / "tumor_mean_cnv_per_gene.tsv"
-        export_mean_cnv_per_gene(out, mean_cnv_path)
 
     output_h5ad = output_dir / "adata_cnv.h5ad"
     out.write(output_h5ad, compression="gzip")
@@ -188,7 +165,6 @@ def run_insitucnv(
         "cluster_keys": cluster_keys,
         "primary_cluster_key": primary_cluster_key,
         "output_h5ad": output_h5ad,
-        "mean_cnv_per_gene": mean_cnv_path,
     }
     (output_dir / "run_summary.json").write_text(json.dumps(summary, indent=2, default=_json_ready))
 

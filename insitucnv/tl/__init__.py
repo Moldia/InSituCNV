@@ -1,7 +1,6 @@
 from insitucnv.tl.cnv import (
     assign_cnv_status,
     assign_cnv_subclones,
-    calculate_cnv_burden,
     cluster_cnv_resolutions,
     compute_cnv_neighbors,
     export_cell_groups,
@@ -17,7 +16,6 @@ from insitucnv.tl.moments import smooth_data_for_cnv
 __all__ = [
     "assign_cnv_status",
     "assign_cnv_subclones",
-    "calculate_cnv_burden",
     "cluster_cnv_resolutions",
     "compute_cnv_neighbors",
     "export_cell_groups",

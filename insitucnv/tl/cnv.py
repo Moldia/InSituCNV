@@ -188,7 +188,6 @@ def run_infercnv(
 def compute_cnv_neighbors(
     adata,
     run_pca: bool = True,
-    run_umap: bool = False,
     copy: bool = False,
     **neighbors_kwargs: Any,
 ):
@@ -197,8 +196,6 @@ def compute_cnv_neighbors(
     if run_pca:
         cnv.tl.pca(out)
     cnv.pp.neighbors(out, **neighbors_kwargs)
-    if run_umap:
-        cnv.tl.umap(out)
     return out
 
 
@@ -272,27 +269,6 @@ def cluster_cnv_resolutions(
     return keys
 
 
-def calculate_cnv_burden(
-    adata,
-    matrix_key: str = "X_cnv",
-    output_key: str = "cnv_burden",
-) -> pd.Series:
-    """Calculate per-cell mean absolute CNV signal."""
-    if matrix_key in adata.obsm:
-        matrix = adata.obsm[matrix_key]
-    elif matrix_key in adata.layers:
-        matrix = adata.layers[matrix_key]
-    else:
-        raise KeyError(f"Could not find '{matrix_key}' in adata.obsm or adata.layers.")
-
-    if sparse.issparse(matrix):
-        burden = _as_dense_vector(abs(matrix).mean(axis=1))
-    else:
-        burden = np.mean(np.abs(np.asarray(matrix)), axis=1)
-    adata.obs[output_key] = burden
-    return adata.obs[output_key]
-
-
 def assign_cnv_status(
     adata,
     cluster_key: str,
@@ -301,29 +277,39 @@ def assign_cnv_status(
     output_key: str = "cnv_status",
     tumor_label: str = "tumor",
     normal_label: str = "normal",
-    burden_key: str = "cnv_burden",
-    matrix_key: str = "X_cnv",
+    unassigned_label: str = "unassigned",
 ):
-    """Annotate CNV clusters as tumor/normal.
+    """Annotate CNV clusters as tumor/normal from explicit cluster choices."""
+    tumor_values = [str(cluster) for cluster in tumor_clusters or []]
+    normal_values = [str(cluster) for cluster in normal_clusters or []]
+    if not tumor_values and not normal_values:
+        raise ValueError("Pass tumor_clusters, normal_clusters, or both. No CNV status is inferred automatically.")
 
-    If neither ``tumor_clusters`` nor ``normal_clusters`` is supplied, the
-    cluster with the lowest CNV burden is treated as normal-like.
-    """
     labels = adata.obs[cluster_key].astype(str)
-    if tumor_clusters is None and normal_clusters is None:
-        if burden_key not in adata.obs:
-            calculate_cnv_burden(adata, matrix_key=matrix_key, output_key=burden_key)
-        normal_cluster = adata.obs.groupby(cluster_key, observed=False)[burden_key].mean().idxmin()
-        normal_clusters = [str(normal_cluster)]
+    all_clusters = set(labels.unique())
+    tumor_set = set(tumor_values)
+    normal_set = set(normal_values)
 
-    if tumor_clusters is not None:
-        tumor_set = {str(cluster) for cluster in tumor_clusters}
-        adata.obs[output_key] = np.where(labels.isin(tumor_set), tumor_label, normal_label)
-    else:
-        normal_set = {str(cluster) for cluster in normal_clusters or []}
-        adata.obs[output_key] = np.where(labels.isin(normal_set), normal_label, tumor_label)
+    overlap = tumor_set & normal_set
+    if overlap:
+        raise ValueError(f"Clusters cannot be both tumor and normal: {sorted(overlap)}")
+    unknown = (tumor_set | normal_set) - all_clusters
+    if unknown:
+        raise ValueError(f"Clusters not found in adata.obs['{cluster_key}']: {sorted(unknown)}")
 
-    adata.obs[output_key] = pd.Categorical(adata.obs[output_key], categories=[tumor_label, normal_label])
+    if not tumor_values:
+        tumor_set = all_clusters - normal_set
+    if not normal_values:
+        normal_set = all_clusters - tumor_set
+
+    status = pd.Series(unassigned_label, index=adata.obs_names, dtype="object")
+    status.loc[labels.isin(normal_set).to_numpy()] = normal_label
+    status.loc[labels.isin(tumor_set).to_numpy()] = tumor_label
+
+    categories = [normal_label, tumor_label]
+    if unassigned_label in set(status):
+        categories.append(unassigned_label)
+    adata.obs[output_key] = pd.Categorical(status, categories=categories)
     return adata
 
 
@@ -332,17 +318,40 @@ def assign_cnv_subclones(
     cluster_key: str,
     tumor_clusters: Sequence[str],
     output_key: str = "cnv_subclones",
+    normal_clusters: Sequence[str] | None = None,
     normal_label: str = "normal",
-    prefix: str = "subclone_",
+    other_tumor_label: str = "tumor",
+    prefix: str = "tumor_clone_",
 ):
-    """Label selected tumor CNV clusters as subclones and all others as normal."""
+    """Label explicitly selected tumor CNV clusters as separate clone groups."""
+    labels = adata.obs[cluster_key].astype(str)
+    all_clusters = set(labels.unique())
     tumor_set = {str(cluster) for cluster in tumor_clusters}
+    normal_set = {str(cluster) for cluster in normal_clusters or []}
+
+    overlap = tumor_set & normal_set
+    if overlap:
+        raise ValueError(f"Clusters cannot be both tumor clones and normal: {sorted(overlap)}")
+    unknown = (tumor_set | normal_set) - all_clusters
+    if unknown:
+        raise ValueError(f"Clusters not found in adata.obs['{cluster_key}']: {sorted(unknown)}")
+
+    if normal_clusters is None:
+        normal_set = all_clusters - tumor_set
 
     def _label(cluster):
         cluster = str(cluster)
-        return f"{prefix}{cluster}" if cluster in tumor_set else normal_label
+        if cluster in tumor_set:
+            return f"{prefix}{cluster}"
+        if cluster in normal_set:
+            return normal_label
+        return other_tumor_label
 
-    adata.obs[output_key] = pd.Categorical(adata.obs[cluster_key].astype(str).map(_label))
+    values = labels.map(_label)
+    categories = [normal_label, *[f"{prefix}{cluster}" for cluster in sorted(tumor_set)]]
+    if other_tumor_label in set(values):
+        categories.append(other_tumor_label)
+    adata.obs[output_key] = pd.Categorical(values, categories=categories)
     return adata
 
 

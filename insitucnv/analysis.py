@@ -72,7 +72,6 @@ def find_optimal_clustering(
 ) -> pd.DataFrame:
     cnv_matrix = adata.obsm[obsm_key]
     cnv_matrix_dense = cnv_matrix.toarray() if hasattr(cnv_matrix, "toarray") else cnv_matrix
-    adata.obs["cnv_burden"] = np.asarray(np.mean(np.abs(cnv_matrix_dense), axis=1)).ravel()
 
     if neighbors_key not in adata.uns:
         sc.pp.neighbors(adata, use_rep=obsm_key, n_neighbors=n_neighbors, key_added=neighbors_key)
@@ -98,7 +97,6 @@ def find_optimal_clustering(
             neighbors_key=neighbors_key,
         )
         spatial_cohesion = _calculate_spatial_cohesion(adata, cluster_key, spatial_key)
-        normal_cluster = adata.obs.groupby(cluster_key)["cnv_burden"].mean().idxmin()
 
         results.append(
             {
@@ -108,7 +106,6 @@ def find_optimal_clustering(
                 "davies_bouldin_score": db_score,
                 "stability_score": stability_score,
                 "spatial_cohesion_score": spatial_cohesion,
-                "putative_normal_cluster": str(normal_cluster),
             }
         )
 

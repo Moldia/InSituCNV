@@ -1,28 +1,17 @@
 # InSituCNV
 
-Reusable Python tools for inferring copy-number variation (CNV) profiles from
-image-based spatial transcriptomics data.
+Reusable notebook workflow for inferring copy-number variation (CNV) profiles
+from image-based spatial transcriptomics data.
 
 This repository contains the general package version of the workflow used in
 ***In Situ* Inference of Copy Number Variations in Image-Based Spatial
 Transcriptomics** by Jensen et al. The manuscript reproduction code is kept in a
 separate repository: https://github.com/Moldia/InSituCNV-manuscript
 
-## What The Package Does
+## Install
 
-`insitucnv` wraps the repeated notebook workflow into reusable functions:
-
-- normalize raw counts;
-- smooth normalized counts over a nearest-neighbor graph;
-- normalize and log-transform the smoothed matrix;
-- add genomic coordinates required by `infercnvpy`;
-- run `infercnvpy`;
-- cluster CNV profiles across one or more Leiden resolutions;
-- plot CNV heatmaps and spatial CNV cluster maps;
-- annotate CNV clusters as tumor/normal or subclones;
-- export mean CNV profiles per gene.
-
-## Installation
+Clone the repository, create the conda environment, and install the package in
+editable mode:
 
 ```bash
 git clone https://github.com/Moldia/InSituCNV.git
@@ -30,102 +19,69 @@ cd InSituCNV
 conda env create -f insitucnv.yml
 conda activate insitucnv_env
 pip install -e .
+jupyter lab
 ```
 
-For an existing environment:
+Open the notebooks from the `notebooks/` directory in JupyterLab.
 
-```bash
-pip install -e .
-```
+## What You Need Before Running
 
-## Minimal Python Workflow
+Prepare an `.h5ad` file with the information needed by the notebooks:
 
-For a full worked example on the 1105_BL Xenium breast cancer sample, see
-`notebooks/03_tutorial_1105_BL_InSituCNV.ipynb`.
+- raw counts, preferably in `adata.layers["raw_counts"]`; if raw counts are in
+  `adata.X`, the first notebook can copy them into `adata.layers["raw_counts"]`;
+- spatial coordinates in `adata.obsm["spatial"]`;
+- a nearest-neighbor graph for smoothing, usually from `scanpy.pp.neighbors`;
+- an `adata.obs` column that identifies normal or healthy reference cells for
+  `infercnvpy`;
+- the exact category names in that reference column that should be used as the
+  normal reference, for example immune, stromal, or other non-tumor cell types;
+- gene names that can be matched to genomic coordinates. The package includes
+  the default `infercnvpy` gene coordinate table, and the notebooks show where
+  to adjust this if your gene annotation differs.
 
-```python
-import scanpy as sc
-import insitucnv as icv
+Do not use normalized or log-transformed values as raw counts. The CNV workflow
+normalizes, smooths, and log-transforms the raw counts itself.
 
-adata = sc.read_h5ad("sample_preprocessed.h5ad")
+## Notebook Workflow
 
-# Required inputs:
-# - raw counts in adata.layers["raw_counts"] or adata.X
-# - reference cell labels in adata.obs["cell_type"]
-# - a neighbor graph for smoothing, for example from sc.pp.neighbors(...)
-# - spatial coordinates in adata.obsm["spatial"] for spatial plots
+Run the notebooks in order for your own dataset, editing the setup cells at the
+top of each notebook.
 
-adata = icv.tl.prepare_cnv_input(
-    adata,
-    raw_layer="raw_counts",
-    target_sum=1e4,
-    smoothing_neighbors=100,
-)
+### 1. Run InSituCNV
 
-icv.tl.run_infercnv(
-    adata,
-    reference_key="cell_type",
-    reference_categories=["T_cells", "B_cells", "Myeloid", "Plasma", "Fibroblast", "Endothelial"],
-    window_size=60,
-    step=10,
-    lfc_clip=4,
-)
+`notebooks/run_insitucnv.ipynb`
 
-icv.tl.compute_cnv_neighbors(adata)
-cluster_keys = icv.tl.cluster_cnv_resolutions(adata, resolutions=[0.1, 0.2, 0.3])
+Use this notebook to run the full CNV analysis step by step:
 
-primary_key = "cnv_leiden_res0.1"
-icv.tl.assign_cnv_status(adata, primary_key)
+- load your spatial transcriptomics `.h5ad` file;
+- choose the raw count layer name with `RAW_LAYER`;
+- choose the normal/reference annotation with `REFERENCE_KEY` and
+  `REFERENCE_CATEGORIES`;
+- normalize raw counts;
+- smooth normalized counts over the neighbor graph;
+- add genomic positions;
+- run `infercnvpy`;
+- cluster CNV profiles across selected Leiden resolutions;
+- visualize chromosome heatmaps and spatial CNV cluster plots.
 
-icv.pl.plot_chromosome_heatmap(adata, groupby=primary_key, output_path="plots/cnv_heatmap.png")
-icv.pl.plot_spatial(adata, color=primary_key, output_path="plots/spatial_cnv_clusters.png")
-icv.pl.plot_spatial(adata, color="cnv_status", output_path="plots/spatial_cnv_status.png")
+After reviewing the heatmap and spatial plot, manually edit:
 
-icv.tl.export_mean_cnv_per_gene(adata, "results/tumor_mean_cnv_per_gene.tsv")
-adata.write("results/sample_cnv.h5ad", compression="gzip")
-```
+- `NORMAL_CLUSTERS`;
+- `TUMOR_CLUSTERS`, if you want to specify tumor clusters directly;
+- `TUMOR_CLONE_CLUSTERS`, if some tumor clusters have distinct enough CNV
+  profiles to report as separate tumor clones.
 
-## One-Command Workflow
-
-For a prepared `.h5ad`:
-
-```bash
-insitucnv \
-  --input-h5ad sample_preprocessed.h5ad \
-  --sample-id sample_01 \
-  --output-dir results/sample_01 \
-  --reference-key cell_type \
-  --reference-categories T_cells,B_cells,Myeloid,Plasma,Fibroblast,Endothelial \
-  --smooth-neighbors 100 \
-  --cluster-resolutions 0.1,0.2,0.3
-```
-
-For a Xenium output directory:
-
-```bash
-insitucnv \
-  --input-dir /path/to/xenium/output \
-  --sample-id sample_01 \
-  --output-dir results/sample_01 \
-  --annotation-csv cell_type_annotations.csv \
-  --reference-key cell_type
-```
+No cluster is marked as normal automatically.
 
 ## Outputs
 
-The high-level workflow writes:
+The notebooks write results under their configured output directories, usually
+`results/...` or `outputs/...`. Typical outputs include:
 
-- `adata_cnv.h5ad`: AnnData with CNV results and cluster annotations;
-- `run_summary.json`: parameters and selected keys;
-- `cluster_resolution_metrics.csv`: optional metrics when requested;
-- `tumor_mean_cnv_per_gene.tsv`: mean CNV signal for tumor cells;
-- `plots/*_heatmap.png`: chromosome heatmaps;
-- `plots/*_spatial.png`: spatial maps for each CNV clustering resolution.
-
-## Notes
-
-`infercnvpy` requires gene coordinates in `adata.var["chromosome"]`,
-`adata.var["start"]`, and `adata.var["end"]`. By default InSituCNV uses the
-same `infercnvpy` reference gene table used in the manuscript notebooks. You can
-also pass your own gene annotation table through
-`icv.pp.add_genomic_positions(..., reference_path="genes.tsv")`.
+- checked input `.h5ad` files;
+- AnnData objects with CNV values and CNV cluster labels;
+- CNV chromosome heatmaps;
+- spatial CNV cluster plots;
+- optional manually annotated tumor/normal and tumor-clone cell group tables;
+- optional mean CNV profiles for manually selected tumor cells.

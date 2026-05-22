@@ -27,6 +27,15 @@ dependencies = [
   "tqdm>=4.66"
 ]
 
+[project.optional-dependencies]
+docs = [
+    "sphinx>=7.0",
+    "sphinx-rtd-theme",
+    "nbsphinx",
+    "myst-parser",
+    "ipython"
+]
+
 [project.scripts]
 insitucnv = "insitucnv.cli:main"
 

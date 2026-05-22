@@ -7,7 +7,6 @@ import infercnvpy as cnv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scanpy as sc
 
 
 def _prepare_output_path(output_path: str | Path | None):
@@ -38,22 +37,6 @@ def plot_chromosome_heatmap(
         show=show,
         **kwargs,
     )
-    output_path = _prepare_output_path(output_path)
-    if output_path is not None:
-        plt.savefig(output_path, dpi=200, bbox_inches="tight")
-        plt.close()
-
-
-def plot_embedding(
-    adata,
-    color: str | Sequence[str],
-    basis: str = "umap",
-    output_path: str | Path | None = None,
-    show: bool = False,
-    **kwargs,
-):
-    """Plot a Scanpy embedding such as UMAP colored by CNV clusters."""
-    sc.pl.embedding(adata, basis=basis, color=color, show=show, **kwargs)
     output_path = _prepare_output_path(output_path)
     if output_path is not None:
         plt.savefig(output_path, dpi=200, bbox_inches="tight")

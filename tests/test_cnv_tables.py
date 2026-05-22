@@ -1,8 +1,9 @@
 import anndata as ad
 import numpy as np
 import pandas as pd
+import pytest
 
-from insitucnv.tl import assign_cnv_status, calculate_cnv_burden, mean_cnv_per_gene
+from insitucnv.tl import assign_cnv_status, assign_cnv_subclones, mean_cnv_per_gene
 
 
 def _adata():
@@ -17,12 +18,24 @@ def _adata():
     return data
 
 
-def test_assign_cnv_status_from_lowest_burden_cluster():
+def test_assign_cnv_status_from_explicit_normal_clusters():
     data = _adata()
-    calculate_cnv_burden(data)
-    assign_cnv_status(data, "cluster")
+    assign_cnv_status(data, "cluster", normal_clusters=["0"])
     assert data.obs.loc["c1", "cnv_status"] == "normal"
     assert set(data.obs.loc[["c2", "c3"], "cnv_status"]) == {"tumor"}
+
+
+def test_assign_cnv_status_requires_manual_cluster_selection():
+    data = _adata()
+    with pytest.raises(ValueError, match="No CNV status is inferred automatically"):
+        assign_cnv_status(data, "cluster")
+
+
+def test_assign_cnv_subclones_from_explicit_tumor_clusters():
+    data = _adata()
+    assign_cnv_subclones(data, "cluster", tumor_clusters=["1"], normal_clusters=["0"])
+    assert data.obs.loc["c1", "cnv_subclones"] == "normal"
+    assert set(data.obs.loc[["c2", "c3"], "cnv_subclones"]) == {"tumor_clone_1"}
 
 
 def test_mean_cnv_per_gene_for_tumor_cells():

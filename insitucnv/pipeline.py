@@ -84,16 +84,15 @@ def preprocess_expression(
     sc.pp.highly_variable_genes(adata, n_top_genes=min(2000, adata.n_vars), subset=False)
     sc.pp.pca(adata, use_highly_variable=True)
     sc.pp.neighbors(adata, n_neighbors=n_neighbors)
-    sc.tl.umap(adata)
     sc.tl.leiden(adata, resolution=leiden_resolution, key_added="leiden")
     return adata
 
 
 def _annotation_column_name(df: pd.DataFrame) -> str:
-    for candidate in ("cell_type", "cell_type_oct25", "annotation"):
+    for candidate in ("cell_type", "annotation"):
         if candidate in df.columns:
             return candidate
-    raise KeyError("Annotation CSV must contain one of: cell_type, cell_type_oct25, annotation.")
+    raise KeyError("Annotation CSV must contain one of: cell_type, annotation.")
 
 
 def _cell_id_column_name(df: pd.DataFrame) -> str:
@@ -191,12 +190,6 @@ def _select_best_resolution(metrics: pd.DataFrame) -> float:
     return float(best["resolution"])
 
 
-def _save_embedding_plot(adata, basis: str, color: str, output_path: Path, title: str):
-    sc.pl.embedding(adata, basis=basis, color=color, show=False, title=title)
-    plt.savefig(output_path, dpi=200, bbox_inches="tight")
-    plt.close()
-
-
 def _save_spatial_plot(adata, color: str, output_path: Path, title: str, size: float = 4.0):
     coords = adata.obsm["spatial"]
     values = adata.obs[color]
@@ -273,17 +266,8 @@ def run_xenium_cnv_protocol(
     cluster_key = f"cnv_leiden_{best_resolution:g}"
     cnv.tl.leiden(adata, resolution=best_resolution, key_added=cluster_key)
 
-    cnv_matrix = adata.obsm["X_cnv"]
-    cnv_dense = cnv_matrix.toarray() if hasattr(cnv_matrix, "toarray") else cnv_matrix
-    adata.obs["cnv_burden"] = np.asarray(np.mean(np.abs(cnv_dense), axis=1)).ravel()
-    normal_cluster = str(adata.obs.groupby(cluster_key)["cnv_burden"].mean().idxmin())
-    adata.obs["cnv_status"] = np.where(adata.obs[cluster_key].astype(str) == normal_cluster, "normal_like", "tumor_like")
-
-    _save_embedding_plot(adata, "umap", reference_key, plots_dir / "umap_cell_types.png", "UMAP: cell types")
-    _save_embedding_plot(adata, "umap", cluster_key, plots_dir / "umap_cnv_clusters.png", "UMAP: CNV clusters")
     _save_spatial_plot(adata, reference_key, plots_dir / "spatial_cell_types.png", "Spatial cell types")
     _save_spatial_plot(adata, cluster_key, plots_dir / "spatial_cnv_clusters.png", "Spatial CNV clusters")
-    _save_spatial_plot(adata, "cnv_status", plots_dir / "spatial_cnv_status.png", "Spatial CNV status")
 
     cnv.pl.chromosome_heatmap(adata, groupby=cluster_key, dendrogram=True, show=False, vmin=-0.4, vmax=0.4)
     plt.savefig(plots_dir / "cnv_heatmap.png", dpi=200, bbox_inches="tight")
@@ -298,7 +282,6 @@ def run_xenium_cnv_protocol(
         "reference_categories": reference_categories,
         "best_resolution": best_resolution,
         "cluster_key": cluster_key,
-        "putative_normal_cluster": normal_cluster,
         "smoothing_neighbors": smoothing_neighbors,
         "window_size": window_size,
         "step": step,
