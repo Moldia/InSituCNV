@@ -2,6 +2,8 @@ Usage
 =====
 
 InSituCNV is designed to be used both as a Python package and through provided notebooks.
+Install the package into the Python environment that runs your notebooks, then
+import it directly with no ``sys.path`` changes.
 
 Python API
 ----------

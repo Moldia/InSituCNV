@@ -3,8 +3,6 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-import scanpy as sc
-
 from insitucnv.pipeline import annotate_cell_types, load_xenium_dataset, preprocess_expression
 from insitucnv.workflow import run_insitucnv
 
@@ -65,6 +63,8 @@ def main(argv: list[str] | None = None):
             output_key=args.reference_key,
         )
     else:
+        import scanpy as sc
+
         adata = sc.read_h5ad(args.input_h5ad)
         if sample_id is not None:
             adata.obs["sample"] = sample_id

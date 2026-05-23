@@ -3,8 +3,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 from pathlib import Path
 
-import infercnvpy as cnv
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -28,6 +26,9 @@ def plot_chromosome_heatmap(
     **kwargs,
 ):
     """Plot and optionally save an ``infercnvpy`` chromosome heatmap."""
+    import infercnvpy as cnv
+    import matplotlib.pyplot as plt
+
     cnv.pl.chromosome_heatmap(
         adata,
         groupby=groupby,
@@ -55,6 +56,8 @@ def plot_spatial(
     show: bool = False,
 ):
     """Plot spatial coordinates colored by an ``adata.obs`` column."""
+    import matplotlib.pyplot as plt
+
     if spatial_key not in adata.obsm:
         raise KeyError(f"adata.obsm['{spatial_key}'] not found.")
     if color not in adata.obs:
@@ -101,6 +104,8 @@ def plot_cluster_composition(
     figsize: tuple[float, float] = (8, 5),
 ):
     """Plot annotation proportions for each CNV cluster."""
+    import matplotlib.pyplot as plt
+
     if cluster_key not in adata.obs:
         raise KeyError(f"adata.obs['{cluster_key}'] not found.")
     if annotation_key not in adata.obs:

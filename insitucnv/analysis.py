@@ -1,7 +1,6 @@
 import anndata as ad
 import numpy as np
 import pandas as pd
-import scanpy as sc
 from scipy.spatial.distance import pdist
 from sklearn.metrics import adjusted_rand_score, davies_bouldin_score, silhouette_score
 from tqdm.auto import tqdm
@@ -35,6 +34,8 @@ def _calculate_cluster_stability(
     n_neighbors: int = 15,
     neighbors_key: str = "cnv_neighbors",
 ) -> float:
+    import scanpy as sc
+
     if neighbors_key not in adata.uns:
         sc.pp.neighbors(adata, use_rep=obsm_key, n_neighbors=n_neighbors, key_added=neighbors_key)
 
@@ -70,6 +71,8 @@ def find_optimal_clustering(
     n_neighbors: int = 15,
     neighbors_key: str = "cnv_neighbors",
 ) -> pd.DataFrame:
+    import scanpy as sc
+
     cnv_matrix = adata.obsm[obsm_key]
     cnv_matrix_dense = cnv_matrix.toarray() if hasattr(cnv_matrix, "toarray") else cnv_matrix
 

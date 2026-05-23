@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import infercnvpy as cnv
 import pandas as pd
 
 
@@ -18,6 +17,8 @@ def _read_reference_table(path: str | Path) -> pd.DataFrame:
 
 def _default_reference() -> pd.DataFrame:
     """Return the infercnvpy reference gene table used in the manuscript notebooks."""
+    import infercnvpy as cnv
+
     return cnv.datasets.maynard2020_3k().var.copy()
 
 

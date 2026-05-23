@@ -8,21 +8,84 @@ This repository contains the general package version of the workflow used in
 Transcriptomics** by Jensen et al. The manuscript reproduction code is kept in a
 separate repository: https://github.com/Moldia/InSituCNV-manuscript
 
-## Install
+## References
 
-Clone the repository, create the conda environment, and install the package in
-editable mode:
+InSituCNV builds upon several excellent packages in the single-cell and spatial
+transcriptomics ecosystem:
+
+- **[infercnvpy](https://github.com/icbi-lab/infercnvpy)**: Core CNV inference logic.
+- **[scVelo](https://github.com/theislab/scvelo)**: Transcriptomic smoothing and analysis.
+- **[Scanpy](https://github.com/scverse/scanpy)**: General single-cell analysis framework.
+- **[AnnData](https://github.com/scverse/anndata)**: Data structures for single-cell data.
+
+If you use InSituCNV in your research, please cite:
+
+Jensen et al. *In Situ* inference of copy number variations in image-based spatial transcriptomics. bioRxiv (2025).
+https://doi.org/10.1101/2025.07.02.662761
+
+## Installation
+
+Install the released package from PyPI when available:
+
+```bash
+pip install insitucnv
+```
+
+Clone the repository and install the package in editable mode:
 
 ```bash
 git clone https://github.com/Moldia/InSituCNV.git
 cd InSituCNV
 conda env create -f insitucnv.yml
 conda activate insitucnv_env
-pip install -e .
+pip install -e ".[dev,docs]"
 jupyter lab
 ```
 
 Open the notebooks from the `notebooks/` directory in JupyterLab.
+
+## Development Setup
+
+Install the package and development tools into your active environment:
+
+```bash
+pip install -e ".[dev,docs]"
+```
+
+Notebooks and examples should import the installed package directly:
+
+```python
+import insitucnv as icv
+```
+
+No `sys.path` edits are required when the editable install is active.
+
+## Running Tests
+
+```bash
+pytest
+```
+
+## Building Docs Locally
+
+```bash
+sphinx-build -b html docs docs/_build/html
+```
+
+The documentation uses Sphinx, the Read the Docs theme, autodoc/autosummary API
+pages, and `myst-nb` for notebook tutorials.
+
+## Releasing Package
+
+Build the source distribution and wheel locally:
+
+```bash
+python -m build
+```
+
+Publish TestPyPI releases through the `publish-testpypi.yml` GitHub Actions
+workflow after configuring Trusted Publishing in TestPyPI. Do not store PyPI or
+TestPyPI API tokens in the repository.
 
 ## What You Need Before Running
 

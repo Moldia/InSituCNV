@@ -1,22 +1,33 @@
 __pycache__/
 *.py[cod]
 *.so
+.Python
 .ipynb_checkpoints/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
 .coverage
+.coverage.*
 htmlcov/
+.tox/
+.nox/
+.venv/
+venv/
+ENV/
 build/
 dist/
+wheelhouse/
 *.egg-info/
 .DS_Store
+docs/_build/
+docs/_autosummary/
 
 # Local analysis outputs
 data/
 results/
 plots/
 output/
+outputs/
 *.h5ad
 *.h5
 *.loom

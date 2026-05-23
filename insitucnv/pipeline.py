@@ -3,15 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import infercnvpy as cnv
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scanpy as sc
-
-from insitucnv.analysis import find_optimal_clustering
-from insitucnv.pp import add_genomic_positions
-from insitucnv.tl import smooth_data_for_cnv
 
 AUTO_MARKERS = {
     "T_cells": ["CD3D", "CD3E", "TRBC1", "TRBC2", "IL7R"],
@@ -29,6 +22,8 @@ REFERENCE_PRIORITY = ["T_cells", "B_cells", "Myeloid", "Plasma", "Fibroblast", "
 
 
 def load_xenium_dataset(xenium_dir: str | Path, sample_id: str | None = None):
+    import scanpy as sc
+
     xenium_dir = Path(xenium_dir)
     matrix_path = xenium_dir / "cell_feature_matrix.h5"
     cells_path = xenium_dir / "cells.csv.gz"
@@ -71,6 +66,8 @@ def preprocess_expression(
     n_neighbors: int = 15,
     leiden_resolution: float = 0.5,
 ):
+    import scanpy as sc
+
     adata = adata.copy()
     sc.pp.filter_cells(adata, min_counts=min_counts)
     sc.pp.filter_cells(adata, min_genes=min_genes)
@@ -110,6 +107,8 @@ def annotate_cell_types(
     majority_threshold: float = 0.45,
     output_key: str = "cell_type",
 ):
+    import scanpy as sc
+
     adata = adata.copy()
 
     if annotation_csv is not None:
@@ -191,6 +190,8 @@ def _select_best_resolution(metrics: pd.DataFrame) -> float:
 
 
 def _save_spatial_plot(adata, color: str, output_path: Path, title: str, size: float = 4.0):
+    import matplotlib.pyplot as plt
+
     coords = adata.obsm["spatial"]
     values = adata.obs[color]
 
@@ -225,6 +226,14 @@ def run_xenium_cnv_protocol(
     lfc_clip: float = 4.0,
     cluster_resolutions: list[float] | None = None,
 ):
+    import infercnvpy as cnv
+    import matplotlib.pyplot as plt
+    import scanpy as sc
+
+    from insitucnv.analysis import find_optimal_clustering
+    from insitucnv.pp import add_genomic_positions
+    from insitucnv.tl import smooth_data_for_cnv
+
     adata = adata.copy()
     output_dir = Path(output_dir)
     plots_dir = output_dir / "plots"

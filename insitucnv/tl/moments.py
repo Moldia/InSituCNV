@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import numpy as np
 from scipy.sparse import csr_matrix
-from scvelo.preprocessing.neighbors import get_connectivities, get_n_neighs, verify_neighbors
 
 
 def smooth_data_for_cnv(
@@ -40,6 +39,8 @@ def smooth_data_for_cnv(
     AnnData
         The modified AnnData object.
     """
+    from scvelo.preprocessing.neighbors import get_connectivities, get_n_neighs, verify_neighbors
+
     adata = data.copy() if copy else data
 
     if n_neighbors > get_n_neighs(adata):

@@ -7,7 +7,6 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from insitucnv.analysis import find_optimal_clustering
 from insitucnv.pl import plot_chromosome_heatmap, plot_spatial
 from insitucnv.tl import (
     cluster_cnv_resolutions,
@@ -124,6 +123,8 @@ def run_insitucnv(
 
     metrics = pd.DataFrame()
     if evaluate_resolution_metrics or select_resolution_by_metrics:
+        from insitucnv.analysis import find_optimal_clustering
+
         metrics = find_optimal_clustering(out, resolutions=cluster_resolutions, spatial_key=spatial_key)
         metrics.to_csv(output_dir / "cluster_resolution_metrics.csv", index=False)
 

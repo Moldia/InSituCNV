@@ -6,7 +6,9 @@ InSituCNV
    :caption: Contents:
 
    installation
+   quickstart
    usage
+   api
    tutorials
    references
 

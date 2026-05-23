@@ -1,0 +1,18 @@
+include README.md
+include LICENSE
+include .readthedocs.yaml
+include insitucnv.yml
+include pyproject.toml
+
+graft docs
+graft tests
+graft insitucnv
+
+prune docs/_build
+prune docs/_autosummary
+prune notebooks/.ipynb_checkpoints
+prune results
+
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude .DS_Store

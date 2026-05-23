@@ -5,16 +5,9 @@ from pathlib import Path
 from typing import Any
 import warnings
 
-import infercnvpy as cnv
-from matplotlib import cm
-from matplotlib.colors import to_hex
 import numpy as np
 import pandas as pd
-import scanpy as sc
 from scipy import sparse
-
-from insitucnv.pp import add_genomic_positions
-from insitucnv.tl.moments import smooth_data_for_cnv
 
 
 def _copy_matrix(matrix):
@@ -53,6 +46,8 @@ def normalize_counts(
     ``adata.X`` is set to the normalized matrix, matching the notebook workflow.
     The modified AnnData object is always returned.
     """
+    import scanpy as sc
+
     out = adata.copy() if copy else adata
     _set_x_from_layer(out, input_layer)
     sc.pp.normalize_total(out, target_sum=target_sum)
@@ -73,6 +68,8 @@ def log_normalize_counts(
     copy: bool = False,
 ):
     """Normalize and log-transform a layer for ``infercnvpy`` input."""
+    import scanpy as sc
+
     out = adata.copy() if copy else adata
     _set_x_from_layer(out, input_layer)
     sc.pp.normalize_total(out, target_sum=target_sum)
@@ -110,6 +107,8 @@ def prepare_cnv_input(
     4. normalize/log-transform smoothed counts into ``log_layer`` and ``adata.X``;
     5. optionally add genomic positions required by ``infercnvpy``.
     """
+    from insitucnv.tl.moments import smooth_data_for_cnv
+
     out = adata.copy() if copy else adata
     if raw_layer not in out.layers:
         out.layers[raw_layer] = _copy_matrix(out.X)
@@ -125,6 +124,8 @@ def prepare_cnv_input(
     log_normalize_counts(out, input_layer=smoothed_layer, output_layer=log_layer, target_sum=target_sum)
 
     if add_gene_positions:
+        from insitucnv.pp import add_genomic_positions
+
         out = add_genomic_positions(
             out,
             reference=gene_reference,
@@ -158,6 +159,8 @@ def run_infercnv(
     **kwargs: Any,
 ):
     """Run ``infercnvpy.tl.infercnv`` with manuscript-style defaults."""
+    import infercnvpy as cnv
+
     out = adata.copy() if copy else adata
     _set_x_from_layer(out, input_layer)
     infercnv_kwargs = {
@@ -192,6 +195,8 @@ def compute_cnv_neighbors(
     **neighbors_kwargs: Any,
 ):
     """Compute the CNV PCA and neighbor graph used for clustering."""
+    import infercnvpy as cnv
+
     out = adata.copy() if copy else adata
     if run_pca:
         cnv.tl.pca(out)
@@ -210,6 +215,9 @@ def _subset_mask(adata, subset_key: str | None, subset_values: Sequence[str] | N
 
 
 def _set_cluster_palette(adata, key: str, outside_label: str | None = None, palette: str = "tab20"):
+    from matplotlib import cm
+    from matplotlib.colors import to_hex
+
     cats = pd.Categorical(adata.obs[key].astype(str)).categories
     cmap = cm.get_cmap(palette, max(len(cats), 1))
     colors = []
@@ -241,6 +249,8 @@ def cluster_cnv_resolutions(
     ``subset_values``. The subset labels are written back to the full AnnData
     object, with non-subset cells assigned ``outside_label``.
     """
+    import infercnvpy as cnv
+
     out = adata.copy() if copy else adata
     mask = _subset_mask(out, subset_key, subset_values)
     keys = []
@@ -260,6 +270,8 @@ def cluster_cnv_resolutions(
         _set_cluster_palette(out, key, outside_label=outside_for_palette, palette=palette)
         if dendrogram:
             try:
+                import scanpy as sc
+
                 sc.tl.dendrogram(out, groupby=key)
             except Exception as exc:  # pragma: no cover - plotting convenience should not stop analysis
                 warnings.warn(f"Could not compute dendrogram for {key}: {exc}", RuntimeWarning, stacklevel=2)
