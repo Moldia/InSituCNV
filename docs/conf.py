@@ -3,8 +3,8 @@ from importlib.metadata import PackageNotFoundError, version as package_version
 
 # -- Project information -----------------------------------------------------
 project = "InSituCNV"
-copyright = f"{datetime.now().year}, Augusta"
-author = "Augusta"
+copyright = f"{datetime.now().year}, Augusta Jensen"
+author = "Augusta Jensen"
 
 try:
     release = package_version("insitucnv")

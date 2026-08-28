@@ -15,7 +15,6 @@ from insitucnv.tl import (
     run_infercnv,
 )
 
-
 REFERENCE_PRIORITY = ["T_cells", "B_cells", "Myeloid", "Plasma", "Fibroblast", "Endothelial", "Adipocytes", "PVLs"]
 
 

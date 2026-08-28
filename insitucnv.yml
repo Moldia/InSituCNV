@@ -1,3 +1,7 @@
+# Convenience conda environment for InSituCNV development.
+# pyproject.toml is the source of truth for runtime dependencies; this file just
+# provides the compiled/system packages plus JupyterLab. After creating the env,
+# run `pip install -e ".[dev,docs]"` to install InSituCNV and its Python deps.
 name: insitucnv_env
 channels:
   - conda-forge
@@ -5,24 +9,10 @@ channels:
 dependencies:
   - python=3.11
   - pip
-  - anndata>=0.10,<0.12
   - h5py
   - jupyterlab
-  - matplotlib>=3.8
-  - numpy>=1.26
-  - pandas>=2.1
-  - pybiomart
   - python-igraph
   - leidenalg
-  - scanpy>=1.10
-  - squidpy
-  - spatialdata
-  - spatialdata-io
   - zarr<3
-  - scikit-learn>=1.4
-  - scipy
-  - scvelo>=0.3.3
-  - seaborn>=0.13
-  - tqdm
   - pip:
-      - infercnvpy>=0.6.0
+      - -e ".[dev,docs]"

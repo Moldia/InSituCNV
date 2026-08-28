@@ -26,21 +26,33 @@ def parse_args(argv: list[str] | None = None):
     parser.add_argument("--output-dir", required=True, help="Directory where outputs will be written.")
     parser.add_argument("--annotation-csv", help="Optional CSV with external cell-type annotations.")
     parser.add_argument("--reference-key", default="cell_type", help="obs column used as inferCNV reference labels.")
-    parser.add_argument("--reference-categories", help="Comma-separated reference categories. Auto-detected if omitted.")
+    parser.add_argument(
+        "--reference-categories", help="Comma-separated reference categories. Auto-detected if omitted."
+    )
     parser.add_argument("--raw-layer", default="raw_counts", help="Layer containing raw counts.")
     parser.add_argument("--target-sum", type=float, default=1e4, help="Target sum for normalization.")
-    parser.add_argument("--min-counts", type=int, default=20, help="Minimum counts per cell during Xenium preprocessing.")
-    parser.add_argument("--min-genes", type=int, default=10, help="Minimum detected genes per cell during Xenium preprocessing.")
+    parser.add_argument(
+        "--min-counts", type=int, default=20, help="Minimum counts per cell during Xenium preprocessing."
+    )
+    parser.add_argument(
+        "--min-genes", type=int, default=10, help="Minimum detected genes per cell during Xenium preprocessing."
+    )
     parser.add_argument("--neighbors", type=int, default=15, help="Neighbors for expression graph construction.")
-    parser.add_argument("--smooth-neighbors", type=int, default=100, help="Neighbors used for smoothing before inferCNV.")
+    parser.add_argument(
+        "--smooth-neighbors", type=int, default=100, help="Neighbors used for smoothing before inferCNV."
+    )
     parser.add_argument("--window-size", type=int, default=60, help="infercnvpy window size.")
     parser.add_argument("--step", type=int, default=10, help="infercnvpy step size.")
     parser.add_argument("--lfc-clip", type=float, default=4.0, help="infercnvpy lfc_clip value.")
     parser.add_argument("--chunksize", type=int, default=1000, help="infercnvpy chunksize.")
     parser.add_argument("--cluster-resolutions", default="0.1,0.2,0.3", help="Comma-separated Leiden resolutions.")
     parser.add_argument("--primary-resolution", type=float, help="Resolution reported as the primary CNV clustering.")
-    parser.add_argument("--select-resolution-by-metrics", action="store_true", help="Select primary resolution by quality metrics.")
-    parser.add_argument("--evaluate-resolution-metrics", action="store_true", help="Save quality metrics for all resolutions.")
+    parser.add_argument(
+        "--select-resolution-by-metrics", action="store_true", help="Select primary resolution by quality metrics."
+    )
+    parser.add_argument(
+        "--evaluate-resolution-metrics", action="store_true", help="Save quality metrics for all resolutions."
+    )
     return parser.parse_args(argv)
 
 
