@@ -83,6 +83,12 @@ def add_genomic_positions(
         if col in reference.columns:
             out.var[col] = out.var_names.map(reference[col])
 
+    if "chromosome" in out.var.columns:
+        # infercnvpy expects string chromosome names ("1"/"chr1"); a CSV reference
+        # is often read back with an integer chromosome column.
+        chrom = out.var["chromosome"]
+        out.var["chromosome"] = chrom.where(chrom.isna(), chrom.astype(str))
+
     if "symbol" not in out.var.columns:
         out.var["symbol"] = out.var_names
 

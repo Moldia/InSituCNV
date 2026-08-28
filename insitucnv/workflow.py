@@ -75,6 +75,10 @@ def run_insitucnv(
     target_sum: float | None = 1e4,
     smoothing_neighbors: int = 100,
     smoothing_mode: str = "connectivities",
+    build_neighbors: bool = True,
+    neighbors_n_neighbors: int = 15,
+    neighbors_n_pcs: int = 50,
+    gene_reference_path: str | Path | None = None,
     window_size: int = 60,
     step: int = 10,
     lfc_clip: float = 4.0,
@@ -92,10 +96,16 @@ def run_insitucnv(
     """Run the core InSituCNV workflow on a prepared AnnData object.
 
     The input AnnData should contain raw counts in ``raw_layer`` or in ``X``,
-    reference labels in ``adata.obs[reference_key]``, a neighbor graph for
-    smoothing, and spatial coordinates in ``adata.obsm[spatial_key]`` if spatial
-    plots are requested. Tumor/normal and clone labels are intentionally left to
-    downstream manual annotation after the heatmap and spatial plots are reviewed.
+    reference labels in ``adata.obs[reference_key]``, and spatial coordinates in
+    ``adata.obsm[spatial_key]`` if spatial plots are requested. A neighbor graph
+    for smoothing is built automatically when absent (``build_neighbors=True``);
+    pass ``build_neighbors=False`` to require a precomputed graph. Gene symbols in
+    ``var_names`` are matched to genomic coordinates using the bundled
+    ``infercnvpy`` human (GRCh38) table unless ``gene_reference_path`` points to a
+    CSV/TSV with ``gene_name,chromosome,start,end`` columns.
+
+    Tumor/normal and clone labels are intentionally left to downstream manual
+    annotation after the heatmap and spatial plots are reviewed.
     """
     out = adata.copy() if copy else adata
     output_dir = Path(output_dir)
@@ -113,6 +123,10 @@ def run_insitucnv(
         target_sum=target_sum,
         smoothing_neighbors=smoothing_neighbors,
         smoothing_mode=smoothing_mode,
+        build_neighbors=build_neighbors,
+        neighbors_n_neighbors=neighbors_n_neighbors,
+        neighbors_n_pcs=neighbors_n_pcs,
+        gene_reference_path=gene_reference_path,
         copy=False,
     )
     reference_categories = reference_categories or resolve_reference_categories(out, reference_key)
@@ -168,6 +182,7 @@ def run_insitucnv(
         "target_sum": target_sum,
         "smoothing_neighbors": smoothing_neighbors,
         "smoothing_mode": smoothing_mode,
+        "build_neighbors": build_neighbors,
         "window_size": window_size,
         "step": step,
         "lfc_clip": lfc_clip,

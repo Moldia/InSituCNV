@@ -22,6 +22,33 @@ def _set_x_from_layer(adata, layer: str | None):
     adata.X = _copy_matrix(adata.layers[layer])
 
 
+def _has_neighbor_graph(adata) -> bool:
+    return "neighbors" in adata.uns and "connectivities" in adata.obsp
+
+
+def _build_neighbor_graph(adata, source_layer: str, n_neighbors: int, n_pcs: int):
+    """Build the standard log1p -> PCA -> kNN graph used for CNV smoothing.
+
+    Runs on a scratch copy of ``adata.layers[source_layer]`` so it does not touch
+    ``adata.X`` or existing layers; only the graph, PCA embedding and their
+    ``uns`` entries are copied back.
+    """
+    import scanpy as sc
+
+    scratch = adata.copy()
+    _set_x_from_layer(scratch, source_layer)
+    sc.pp.log1p(scratch)
+    n_comps = max(2, min(n_pcs, min(scratch.n_obs, scratch.n_vars) - 1))
+    sc.pp.pca(scratch, n_comps=n_comps)
+    sc.pp.neighbors(scratch, n_neighbors=n_neighbors)
+
+    adata.uns["neighbors"] = scratch.uns["neighbors"]
+    adata.uns["pca"] = scratch.uns.get("pca", {})
+    adata.obsm["X_pca"] = scratch.obsm["X_pca"]
+    adata.obsp["distances"] = scratch.obsp["distances"]
+    adata.obsp["connectivities"] = scratch.obsp["connectivities"]
+
+
 def _as_dense_vector(values) -> np.ndarray:
     return np.asarray(values).ravel()
 
@@ -100,6 +127,9 @@ def prepare_cnv_input(
     target_sum: float | None = 1e4,
     smoothing_neighbors: int = 100,
     smoothing_mode: str = "connectivities",
+    build_neighbors: bool = True,
+    neighbors_n_neighbors: int = 15,
+    neighbors_n_pcs: int = 50,
     add_gene_positions: bool = True,
     gene_reference: pd.DataFrame | None = None,
     gene_reference_path: str | Path | None = None,
@@ -111,9 +141,14 @@ def prepare_cnv_input(
     Steps:
     1. restore raw counts from ``raw_layer``;
     2. normalize counts into ``normalized_layer``;
-    3. smooth normalized counts over the neighbor graph into ``smoothed_layer``;
-    4. normalize/log-transform smoothed counts into ``log_layer`` and ``adata.X``;
-    5. optionally add genomic positions required by ``infercnvpy``.
+    3. if ``build_neighbors`` and no neighbor graph is present, build the standard
+       log1p -> PCA -> kNN graph used for smoothing;
+    4. smooth normalized counts over the neighbor graph into ``smoothed_layer``;
+    5. normalize/log-transform smoothed counts into ``log_layer`` and ``adata.X``;
+    6. optionally add genomic positions required by ``infercnvpy``.
+
+    Pass ``build_neighbors=False`` to require a precomputed graph (the behaviour
+    before this option existed).
     """
     from insitucnv.tl.moments import smooth_data_for_cnv
 
@@ -122,6 +157,18 @@ def prepare_cnv_input(
         out.layers[raw_layer] = _copy_matrix(out.X)
 
     normalize_counts(out, input_layer=raw_layer, output_layer=normalized_layer, target_sum=target_sum)
+    if not _has_neighbor_graph(out):
+        if not build_neighbors:
+            raise ValueError(
+                "adata has no neighbor graph and build_neighbors=False. Run "
+                "scanpy.pp.neighbors first, or leave build_neighbors=True."
+            )
+        _build_neighbor_graph(
+            out,
+            source_layer=normalized_layer,
+            n_neighbors=neighbors_n_neighbors,
+            n_pcs=neighbors_n_pcs,
+        )
     smooth_data_for_cnv(
         out,
         layer_w_norm_counts=normalized_layer,
@@ -149,6 +196,7 @@ def prepare_cnv_input(
         "target_sum": target_sum,
         "smoothing_neighbors": smoothing_neighbors,
         "smoothing_mode": smoothing_mode,
+        "neighbors_built": build_neighbors,
     }
     return out
 
