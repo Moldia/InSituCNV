@@ -13,4 +13,4 @@ Publications
 
 If you use InSituCNV in your research, please cite:
 
-* Jensen et al., *In Situ* Inference of Copy Number Variations in Image-Based Spatial Transcriptomics (2024).
+* Jensen et al. *In Situ* inference of copy number variations in image-based spatial transcriptomics. bioRxiv (2025). https://doi.org/10.1101/2025.07.02.662761

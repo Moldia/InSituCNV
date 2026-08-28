@@ -11,6 +11,7 @@ InSituCNV
    api
    tutorials
    references
+   changelog
 
 Introduction
 ------------

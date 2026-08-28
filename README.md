@@ -25,126 +25,66 @@ https://doi.org/10.1101/2025.07.02.662761
 
 ## Installation
 
-Install the released package from PyPI when available:
-
 ```bash
-pip install insitucnv
+pip install insitucnv        # once released on PyPI
 ```
 
-Clone the repository and install the package in editable mode:
+From a clone (also see [CONTRIBUTING.md](CONTRIBUTING.md) for the full dev setup):
 
 ```bash
 git clone https://github.com/Moldia/InSituCNV.git
 cd InSituCNV
 conda env create -f insitucnv.yml
 conda activate insitucnv_env
-pip install -e ".[dev,docs]"
-jupyter lab
 ```
 
-Open the notebooks from the `notebooks/` directory in JupyterLab.
-
-## Development Setup
-
-Install the package and development tools into your active environment:
-
-```bash
-pip install -e ".[dev,docs]"
-```
-
-Notebooks and examples should import the installed package directly:
+## Quickstart
 
 ```python
+import scanpy as sc
 import insitucnv as icv
+
+adata = sc.read_h5ad(icv.download_example_dataset())   # or your own .h5ad
+
+result = icv.run_insitucnv(
+    adata,
+    output_dir="results/sample",
+    reference_key="cell_type",
+    reference_categories=["T_cells", "B_cells", "Stromal"],
+)
 ```
 
-No `sys.path` edits are required when the editable install is active.
-
-## Running Tests
-
-```bash
-pytest
-```
-
-## Building Docs Locally
-
-```bash
-sphinx-build -b html docs docs/_build/html
-```
-
-The documentation uses Sphinx, the Read the Docs theme, autodoc/autosummary API
-pages, and `myst-nb` for notebook tutorials.
-
-## Releasing Package
-
-Build the source distribution and wheel locally:
-
-```bash
-python -m build
-```
-
-Publish TestPyPI releases through the `publish-testpypi.yml` GitHub Actions
-workflow after configuring Trusted Publishing in TestPyPI. Do not store PyPI or
-TestPyPI API tokens in the repository.
+Or work through `notebooks/run_insitucnv.ipynb`, which runs the same steps one at
+a time and downloads the example dataset by default.
 
 ## What You Need Before Running
 
-Prepare an `.h5ad` file with the information needed by the notebooks:
+An `.h5ad` file with:
 
-- raw counts, preferably in `adata.layers["raw_counts"]`; if raw counts are in
-  `adata.X`, the first notebook can copy them into `adata.layers["raw_counts"]`;
-- spatial coordinates in `adata.obsm["spatial"]`;
-- a nearest-neighbor graph for smoothing, usually from `scanpy.pp.neighbors`;
-- an `adata.obs` column that identifies normal or healthy reference cells for
-  `infercnvpy`;
-- the exact category names in that reference column that should be used as the
-  normal reference, for example immune, stromal, or other non-tumor cell types;
-- gene names that can be matched to genomic coordinates. The package includes
-  the default `infercnvpy` gene coordinate table, and the notebooks show where
-  to adjust this if your gene annotation differs.
+- **raw counts** in `adata.layers["raw_counts"]` (or in `adata.X` — the workflow
+  copies them). Do not pass normalized or log-transformed values as raw counts;
+  the workflow normalizes, smooths, and log-transforms them itself.
+- **spatial coordinates** in `adata.obsm["spatial"]`;
+- an **`adata.obs` column** identifying non-tumor reference cells (immune,
+  stromal, …) and the category names to use, passed as `reference_key` and
+  `reference_categories`;
+- **human gene symbols** (GRCh38) in `adata.var_names`. Genomic coordinates come
+  from the bundled `infercnvpy` table; pass `gene_reference_path=` a CSV with
+  `gene_name,chromosome,start,end` for a different annotation.
 
-Do not use normalized or log-transformed values as raw counts. The CNV workflow
-normalizes, smooths, and log-transforms the raw counts itself.
+A nearest-neighbor graph for smoothing is built automatically when absent
+(`build_neighbors=True`); pass `build_neighbors=False` to require your own.
 
-## Notebook Workflow
+## Outputs and manual annotation
 
-Run the notebooks in order for your own dataset, editing the setup cells at the
-top of each notebook.
+`run_insitucnv` writes the CNV `AnnData`, chromosome heatmaps, spatial cluster
+plots and a `run_summary.json` under `output_dir`. Tumor/normal and clone labels
+are **not** inferred automatically: after reviewing the heatmap, pass the cluster
+labels you choose to `icv.tl.assign_cnv_status` /
+`icv.tl.assign_cnv_subclones`, then export Xenium Explorer-compatible tables with
+`icv.tl.export_cell_groups` and `icv.tl.export_mean_cnv_per_gene`.
 
-### 1. Run InSituCNV
+## Contributing
 
-`notebooks/run_insitucnv.ipynb`
-
-Use this notebook to run the full CNV analysis step by step:
-
-- load your spatial transcriptomics `.h5ad` file;
-- choose the raw count layer name with `RAW_LAYER`;
-- choose the normal/reference annotation with `REFERENCE_KEY` and
-  `REFERENCE_CATEGORIES`;
-- normalize raw counts;
-- smooth normalized counts over the neighbor graph;
-- add genomic positions;
-- run `infercnvpy`;
-- cluster CNV profiles across selected Leiden resolutions;
-- visualize chromosome heatmaps and spatial CNV cluster plots.
-
-After reviewing the heatmap and spatial plot, manually edit:
-
-- `NORMAL_CLUSTERS`;
-- `TUMOR_CLUSTERS`, if you want to specify tumor clusters directly;
-- `TUMOR_CLONE_CLUSTERS`, if some tumor clusters have distinct enough CNV
-  profiles to report as separate tumor clones.
-
-No cluster is marked as normal automatically.
-
-## Outputs
-
-The notebooks write results under their configured output directories, usually
-`results/...` or `outputs/...`. Typical outputs include:
-
-- checked input `.h5ad` files;
-- AnnData objects with CNV values and CNV cluster labels;
-- CNV chromosome heatmaps;
-- spatial CNV cluster plots;
-- optional manually annotated tumor/normal and tumor-clone cell group tables;
-- optional mean CNV profiles for manually selected tumor cells.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the development setup, tests, linting,
+docs and release process. Changes are recorded in [CHANGELOG.md](CHANGELOG.md).
