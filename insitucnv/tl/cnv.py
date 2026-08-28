@@ -34,6 +34,14 @@ def _cluster_key(prefix: str, resolution: float) -> str:
     return f"{prefix}{_resolution_label(resolution)}"
 
 
+CNV_LEIDEN_PREFIX = "cnv_leiden_res"
+
+
+def cnv_leiden_key(resolution: float) -> str:
+    """Canonical ``adata.obs`` key for CNV Leiden clustering at a resolution."""
+    return _cluster_key(CNV_LEIDEN_PREFIX, resolution)
+
+
 def normalize_counts(
     adata,
     input_layer: str | None = "raw_counts",
@@ -215,11 +223,11 @@ def _subset_mask(adata, subset_key: str | None, subset_values: Sequence[str] | N
 
 
 def _set_cluster_palette(adata, key: str, outside_label: str | None = None, palette: str = "tab20"):
-    from matplotlib import cm
+    from matplotlib import colormaps
     from matplotlib.colors import to_hex
 
     cats = pd.Categorical(adata.obs[key].astype(str)).categories
-    cmap = cm.get_cmap(palette, max(len(cats), 1))
+    cmap = colormaps[palette].resampled(max(len(cats), 1))
     colors = []
     for idx, category in enumerate(cats):
         if outside_label is not None and str(category) == str(outside_label):

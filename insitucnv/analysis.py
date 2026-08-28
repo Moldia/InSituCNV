@@ -5,6 +5,8 @@ from scipy.spatial.distance import pdist
 from sklearn.metrics import adjusted_rand_score, davies_bouldin_score, silhouette_score
 from tqdm.auto import tqdm
 
+from insitucnv.tl.cnv import cnv_leiden_key
+
 
 def _calculate_spatial_cohesion(adata: ad.AnnData, cluster_key: str, spatial_key: str = "spatial") -> float:
     cohesion_scores = {}
@@ -81,7 +83,7 @@ def find_optimal_clustering(
 
     results = []
     for res in tqdm(resolutions, desc="Testing CNV cluster resolutions"):
-        cluster_key = f"cnv_leiden_{res:g}"
+        cluster_key = cnv_leiden_key(res)
         sc.tl.leiden(adata, resolution=res, key_added=cluster_key, neighbors_key=neighbors_key)
         labels = adata.obs[cluster_key]
         n_clusters = len(labels.unique())

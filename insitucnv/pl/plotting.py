@@ -71,8 +71,10 @@ def plot_spatial(
         scatter = ax.scatter(coords[:, 0], coords[:, 1], c=values, s=point_size, cmap="viridis", linewidths=0)
         fig.colorbar(scatter, ax=ax, shrink=0.8)
     else:
+        from matplotlib import colormaps
+
         categories = pd.Categorical(values.astype(str))
-        cmap = plt.get_cmap(palette, max(len(categories.categories), 1))
+        cmap = colormaps[palette].resampled(max(len(categories.categories), 1))
         for idx, category in enumerate(categories.categories):
             mask = categories == category
             ax.scatter(coords[mask, 0], coords[mask, 1], s=point_size, color=cmap(idx), label=category, linewidths=0)

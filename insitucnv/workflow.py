@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +15,7 @@ from insitucnv.tl import (
     prepare_cnv_input,
     run_infercnv,
 )
+from insitucnv.tl.cnv import cnv_leiden_key
 
 REFERENCE_PRIORITY = ["T_cells", "B_cells", "Myeloid", "Plasma", "Fibroblast", "Endothelial", "Adipocytes", "PVLs"]
 
@@ -28,6 +30,14 @@ def resolve_reference_categories(adata, reference_key: str, priority: list[str] 
         return selected
     fallback = sorted(label for label in present if label.lower() not in {"epithelial", "tumor", "unknown"})
     if fallback:
+        warnings.warn(
+            "No priority reference cell types were found in "
+            f"adata.obs['{reference_key}']. Falling back to every category except "
+            f"epithelial/tumor/unknown as the inferCNV reference: {fallback}. "
+            "Pass reference_categories explicitly to control this.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
         return fallback
     raise ValueError(f"Could not determine inferCNV reference categories from '{reference_key}'.")
 
@@ -130,7 +140,7 @@ def run_insitucnv(
     if select_resolution_by_metrics and not metrics.empty:
         primary_resolution = select_best_resolution(metrics)
     if primary_resolution is not None:
-        primary_cluster_key = f"cnv_leiden_res{float(primary_resolution):g}"
+        primary_cluster_key = cnv_leiden_key(primary_resolution)
     else:
         primary_cluster_key = cluster_keys[0]
 
