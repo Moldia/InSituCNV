@@ -53,6 +53,15 @@ def parse_args(argv: list[str] | None = None):
     parser.add_argument(
         "--evaluate-resolution-metrics", action="store_true", help="Save quality metrics for all resolutions."
     )
+    parser.add_argument(
+        "--no-build-neighbors",
+        action="store_true",
+        help="Require a precomputed neighbor graph instead of building one for smoothing.",
+    )
+    parser.add_argument(
+        "--gene-reference-path",
+        help="CSV/TSV with gene_name,chromosome,start,end. Defaults to the infercnvpy human table.",
+    )
     return parser.parse_args(argv)
 
 
@@ -93,6 +102,9 @@ def main(argv: list[str] | None = None):
         raw_layer=args.raw_layer,
         target_sum=args.target_sum,
         smoothing_neighbors=args.smooth_neighbors,
+        build_neighbors=not args.no_build_neighbors,
+        neighbors_n_neighbors=args.neighbors,
+        gene_reference_path=args.gene_reference_path,
         window_size=args.window_size,
         step=args.step,
         lfc_clip=args.lfc_clip,

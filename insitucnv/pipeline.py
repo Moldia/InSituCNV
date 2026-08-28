@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import numpy as np
@@ -17,8 +16,6 @@ AUTO_MARKERS = {
     "PVLs": ["RGS5", "MCAM", "CSPG4", "ACTA2", "PDGFRB"],
     "Epithelial": ["EPCAM", "KRT8", "KRT18", "KRT19", "KRT17"],
 }
-
-REFERENCE_PRIORITY = ["T_cells", "B_cells", "Myeloid", "Plasma", "Fibroblast", "Endothelial", "Adipocytes", "PVLs"]
 
 
 def load_xenium_dataset(xenium_dir: str | Path, sample_id: str | None = None):
@@ -160,141 +157,45 @@ def annotate_cell_types(
     return adata
 
 
-def _resolve_reference_categories(adata, reference_key: str) -> list[str]:
-    present = set(adata.obs[reference_key].astype(str).unique())
-    selected = [label for label in REFERENCE_PRIORITY if label in present]
-    if selected:
-        return selected
-    fallback = sorted(label for label in present if label not in {"Epithelial", "Unknown"})
-    if fallback:
-        return fallback
-    raise ValueError(f"Could not determine inferCNV reference categories from {reference_key}.")
-
-
-def _select_best_resolution(metrics: pd.DataFrame) -> float:
-    if metrics.empty:
-        raise ValueError("No valid clustering resolutions were evaluated.")
-
-    ranked = metrics.copy()
-    ranked["db_inverted"] = -ranked["davies_bouldin_score"]
-    metric_cols = ["silhouette_score", "stability_score", "spatial_cohesion_score", "db_inverted"]
-    for col in metric_cols:
-        std = ranked[col].std()
-        if pd.isna(std) or std == 0:
-            ranked[f"{col}_z"] = 0.0
-        else:
-            ranked[f"{col}_z"] = (ranked[col] - ranked[col].mean()) / std
-    ranked["combined_score"] = ranked[[f"{col}_z" for col in metric_cols]].sum(axis=1)
-    best = ranked.sort_values(["combined_score", "stability_score", "silhouette_score"], ascending=False).iloc[0]
-    return float(best["resolution"])
-
-
-def _save_spatial_plot(adata, color: str, output_path: Path, title: str, size: float = 4.0):
-    import matplotlib.pyplot as plt
-
-    coords = adata.obsm["spatial"]
-    values = adata.obs[color]
-
-    fig, ax = plt.subplots(figsize=(8, 8))
-    if pd.api.types.is_numeric_dtype(values):
-        scatter = ax.scatter(coords[:, 0], coords[:, 1], c=values, s=size, cmap="viridis", linewidths=0)
-        fig.colorbar(scatter, ax=ax, shrink=0.8)
-    else:
-        cats = pd.Categorical(values.astype(str))
-        palette = plt.get_cmap("tab20", max(len(cats.categories), 1))
-        for idx, category in enumerate(cats.categories):
-            mask = cats == category
-            ax.scatter(coords[mask, 0], coords[mask, 1], s=size, label=category, color=palette(idx), linewidths=0)
-        ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), frameon=False, markerscale=3)
-
-    ax.set_title(title)
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-    ax.invert_yaxis()
-    plt.savefig(output_path, dpi=200, bbox_inches="tight")
-    plt.close(fig)
-
-
 def run_xenium_cnv_protocol(
     adata,
     output_dir: str | Path,
     reference_key: str = "cell_type",
     reference_categories: list[str] | None = None,
-    smoothing_neighbors: int = 20,
+    smoothing_neighbors: int = 100,
     window_size: int = 60,
     step: int = 10,
     lfc_clip: float = 4.0,
     cluster_resolutions: list[float] | None = None,
 ):
-    import infercnvpy as cnv
-    import matplotlib.pyplot as plt
-    import scanpy as sc
+    """Run the Xenium CNV protocol on an annotated AnnData.
 
-    from insitucnv.analysis import find_optimal_clustering
-    from insitucnv.pp import add_genomic_positions
-    from insitucnv.tl import smooth_data_for_cnv
+    Thin wrapper around :func:`insitucnv.workflow.run_insitucnv`: it evaluates the
+    clustering-quality metrics and reports the metric-selected resolution as the
+    primary CNV clustering. ``adata`` should already carry ``raw_counts``,
+    ``spatial`` and a ``reference_key`` column (e.g. from
+    :func:`load_xenium_dataset` + :func:`preprocess_expression` +
+    :func:`annotate_cell_types`).
 
-    adata = adata.copy()
-    output_dir = Path(output_dir)
-    plots_dir = output_dir / "plots"
-    output_dir.mkdir(parents=True, exist_ok=True)
-    plots_dir.mkdir(parents=True, exist_ok=True)
+    Returns ``(adata, metrics, summary)``.
+    """
+    from insitucnv.workflow import run_insitucnv
 
-    adata.write(output_dir / "adata_preprocessed.h5ad", compression="gzip")
-
-    adata.X = adata.layers["raw_counts"].copy()
-    sc.pp.normalize_total(adata)
-    adata.layers["norm"] = adata.X.copy()
-    smooth_data_for_cnv(adata, layer_w_norm_counts="norm", n_neighbors=smoothing_neighbors)
-    adata.layers["smooth_norm"] = adata.layers["M"].copy()
-
-    adata.X = adata.layers["M"].copy()
-    sc.pp.normalize_total(adata)
-    sc.pp.log1p(adata)
-    adata = add_genomic_positions(adata)
-
-    reference_categories = reference_categories or _resolve_reference_categories(adata, reference_key)
-
-    cnv.tl.infercnv(
+    result = run_insitucnv(
         adata,
+        output_dir=output_dir,
+        reference_key=reference_key,
+        reference_categories=reference_categories,
+        smoothing_neighbors=smoothing_neighbors,
         window_size=window_size,
         step=step,
         lfc_clip=lfc_clip,
-        reference_key=reference_key,
-        reference_cat=reference_categories,
-        chunksize=1000,
-        calculate_gene_values=True,
+        cluster_resolutions=cluster_resolutions,
+        evaluate_resolution_metrics=True,
+        select_resolution_by_metrics=True,
     )
-    cnv.tl.pca(adata)
-    cnv.pp.neighbors(adata)
-
-    cluster_resolutions = cluster_resolutions or [0.1, 0.2, 0.3]
-    metrics = find_optimal_clustering(adata, resolutions=cluster_resolutions)
-    metrics.to_csv(output_dir / "cluster_resolution_metrics.csv", index=False)
-    best_resolution = _select_best_resolution(metrics) if not metrics.empty else float(cluster_resolutions[0])
-    cluster_key = f"cnv_leiden_{best_resolution:g}"
-    cnv.tl.leiden(adata, resolution=best_resolution, key_added=cluster_key)
-
-    _save_spatial_plot(adata, reference_key, plots_dir / "spatial_cell_types.png", "Spatial cell types")
-    _save_spatial_plot(adata, cluster_key, plots_dir / "spatial_cnv_clusters.png", "Spatial CNV clusters")
-
-    cnv.pl.chromosome_heatmap(adata, groupby=cluster_key, dendrogram=True, show=False, vmin=-0.4, vmax=0.4)
-    plt.savefig(plots_dir / "cnv_heatmap.png", dpi=200, bbox_inches="tight")
-    plt.close()
-
-    adata.write(output_dir / "adata_cnv.h5ad", compression="gzip")
-    summary = {
-        "sample_id": str(adata.obs["sample"].iloc[0]) if "sample" in adata.obs.columns and adata.n_obs else "unknown",
-        "n_cells": int(adata.n_obs),
-        "n_genes": int(adata.n_vars),
-        "reference_key": reference_key,
-        "reference_categories": reference_categories,
-        "best_resolution": best_resolution,
-        "cluster_key": cluster_key,
-        "smoothing_neighbors": smoothing_neighbors,
-        "window_size": window_size,
-        "step": step,
-        "lfc_clip": lfc_clip,
-    }
-    (output_dir / "run_summary.json").write_text(json.dumps(summary, indent=2))
-    return adata, metrics, summary
+    out = result["adata"]
+    summary = dict(result["summary"])
+    if "sample" in out.obs.columns and out.n_obs:
+        summary["sample_id"] = str(out.obs["sample"].iloc[0])
+    return out, result["metrics"], summary
