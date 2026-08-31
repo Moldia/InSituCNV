@@ -60,6 +60,14 @@ def add_genomic_positions(
     AnnData
         AnnData with ``chromosome``, ``start``, and ``end`` in ``adata.var``.
     """
+    have_positions = all(col in adata.var.columns for col in GENOMIC_COLUMNS) and (
+        adata.var["chromosome"].notna().any()
+    )
+    if reference is None and reference_path is None and have_positions:
+        if not quiet:
+            print("Genomic positions already present in adata.var; keeping them.")
+        return adata.copy() if copy else adata
+
     if reference is None:
         reference = _read_reference_table(reference_path) if reference_path is not None else _default_reference()
     else:
