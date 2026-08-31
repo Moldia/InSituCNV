@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import pandas as pd
 
 from insitucnv.pl import plot_chromosome_heatmap, plot_spatial
 from insitucnv.tl import (
@@ -42,22 +41,6 @@ def resolve_reference_categories(adata, reference_key: str, priority: list[str] 
     raise ValueError(f"Could not determine inferCNV reference categories from '{reference_key}'.")
 
 
-def select_best_resolution(metrics: pd.DataFrame) -> float:
-    """Select a Leiden resolution from the metrics returned by ``find_optimal_clustering``."""
-    if metrics.empty:
-        raise ValueError("No valid clustering resolutions were evaluated.")
-
-    ranked = metrics.copy()
-    ranked["db_inverted"] = -ranked["davies_bouldin_score"]
-    metric_cols = ["silhouette_score", "stability_score", "spatial_cohesion_score", "db_inverted"]
-    for col in metric_cols:
-        std = ranked[col].std()
-        ranked[f"{col}_z"] = 0.0 if pd.isna(std) or std == 0 else (ranked[col] - ranked[col].mean()) / std
-    ranked["combined_score"] = ranked[[f"{col}_z" for col in metric_cols]].sum(axis=1)
-    best = ranked.sort_values(["combined_score", "stability_score", "silhouette_score"], ascending=False).iloc[0]
-    return float(best["resolution"])
-
-
 def _json_ready(value):
     if isinstance(value, np.generic):
         return value.item()
@@ -73,7 +56,7 @@ def run_insitucnv(
     reference_categories: list[str] | None = None,
     raw_layer: str = "raw_counts",
     target_sum: float | None = 1e4,
-    smoothing_neighbors: int = 100,
+    smoothing_neighbors: int = 20,
     smoothing_mode: str = "connectivities",
     build_neighbors: bool = True,
     neighbors_n_neighbors: int = 15,
@@ -85,8 +68,6 @@ def run_insitucnv(
     chunksize: int = 1000,
     cluster_resolutions: list[float] | None = None,
     primary_resolution: float | None = None,
-    select_resolution_by_metrics: bool = False,
-    evaluate_resolution_metrics: bool = False,
     spatial_key: str = "spatial",
     point_size: float = 4.0,
     save_intermediate: bool = True,
@@ -144,15 +125,6 @@ def run_insitucnv(
     compute_cnv_neighbors(out)
     cluster_keys = cluster_cnv_resolutions(out, cluster_resolutions, dendrogram=True)
 
-    metrics = pd.DataFrame()
-    if evaluate_resolution_metrics or select_resolution_by_metrics:
-        from insitucnv.analysis import find_optimal_clustering
-
-        metrics = find_optimal_clustering(out, resolutions=cluster_resolutions, spatial_key=spatial_key)
-        metrics.to_csv(output_dir / "cluster_resolution_metrics.csv", index=False)
-
-    if select_resolution_by_metrics and not metrics.empty:
-        primary_resolution = select_best_resolution(metrics)
     if primary_resolution is not None:
         primary_cluster_key = cnv_leiden_key(primary_resolution)
     else:
@@ -197,6 +169,5 @@ def run_insitucnv(
         "adata": out,
         "cluster_keys": cluster_keys,
         "primary_cluster_key": primary_cluster_key,
-        "metrics": metrics,
         "summary": summary,
     }

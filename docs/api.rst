@@ -6,7 +6,6 @@ API Reference
    :recursive:
 
    insitucnv
-   insitucnv.analysis
    insitucnv.cli
    insitucnv.datasets
    insitucnv.pipeline

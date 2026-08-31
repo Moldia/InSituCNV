@@ -18,26 +18,34 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `adata.var` instead of always consulting the (network) reference table.
 - `scripts/synthetic_example_dataset.py` builds a small offline dataset used by
   the notebook-execution CI job.
-- `CONTRIBUTING.md`, this changelog, a ruff config and a pre-commit config.
+- `CONTRIBUTING.md`, this changelog, and an (unenforced) ruff config.
 
 ### Changed
 - Single high-level engine: `run_xenium_cnv_protocol()` now prepares an AnnData
   and delegates to `run_insitucnv()` instead of re-implementing the smoothing /
-  inferCNV / clustering steps. Its `smoothing_neighbors` default changed from
-  `20` to `100` to match `run_insitucnv()`. **This can change results for the
-  Xenium protocol path** — pass `smoothing_neighbors=20` to reproduce older runs.
-- `find_optimal_clustering()` now writes cluster keys as `cnv_leiden_res<r>`,
-  matching `cluster_cnv_resolutions()` and `select_best_resolution()` (previously
-  `cnv_leiden_<r>`, which broke `select_resolution_by_metrics=True`).
+  inferCNV / clustering steps. It returns `(adata, summary)` (0.1.0 returned
+  `(adata, metrics, summary)`).
+- `smoothing_neighbors` defaults to `20` everywhere — the value used in the
+  manuscript notebooks and by `smooth_data_for_cnv()`. 0.1.0's `run_insitucnv()`
+  and `prepare_cnv_input()` defaulted to `100`; pass `smoothing_neighbors=100` to
+  reproduce those runs.
 - The shipped notebook `notebooks/run_insitucnv.ipynb` was rewritten to use the
   package API end to end (no direct `infercnvpy` calls) and to run top to bottom
   on the example dataset.
 - Package version is now single-sourced from `insitucnv/__about__.py`.
 
+### Removed
+- `insitucnv.analysis.find_optimal_clustering()` and the
+  `select_resolution_by_metrics` / `evaluate_resolution_metrics` options of
+  `run_insitucnv()` (and the matching CLI flags). Pick a clustering resolution by
+  inspecting the chromosome heatmap and pass `primary_resolution=`.
+
 ### Fixed
 - `cluster_cnv_resolutions()` and the Xenium spatial plots no longer use the
   `matplotlib.cm.get_cmap` / `plt.get_cmap(name, N)` APIs removed in
   matplotlib 3.9, so clustering works on modern matplotlib.
+- `cluster_cnv_resolutions()` and `run_insitucnv()` share one CNV Leiden key
+  convention (`cnv_leiden_res<r>`) via `insitucnv.tl.cnv_leiden_key()`.
 
 ## [0.1.0] - 2026-05-23
 

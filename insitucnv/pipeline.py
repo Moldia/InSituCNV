@@ -162,22 +162,23 @@ def run_xenium_cnv_protocol(
     output_dir: str | Path,
     reference_key: str = "cell_type",
     reference_categories: list[str] | None = None,
-    smoothing_neighbors: int = 100,
+    smoothing_neighbors: int = 20,
     window_size: int = 60,
     step: int = 10,
     lfc_clip: float = 4.0,
     cluster_resolutions: list[float] | None = None,
+    primary_resolution: float | None = None,
 ):
     """Run the Xenium CNV protocol on an annotated AnnData.
 
-    Thin wrapper around :func:`insitucnv.workflow.run_insitucnv`: it evaluates the
-    clustering-quality metrics and reports the metric-selected resolution as the
-    primary CNV clustering. ``adata`` should already carry ``raw_counts``,
-    ``spatial`` and a ``reference_key`` column (e.g. from
-    :func:`load_xenium_dataset` + :func:`preprocess_expression` +
-    :func:`annotate_cell_types`).
+    Thin wrapper around :func:`insitucnv.workflow.run_insitucnv`. ``adata`` should
+    already carry ``raw_counts``, ``spatial`` and a ``reference_key`` column (e.g.
+    from :func:`load_xenium_dataset` + :func:`preprocess_expression` +
+    :func:`annotate_cell_types`). Resolution choice is left to the caller: the
+    first of ``cluster_resolutions`` is reported as primary unless
+    ``primary_resolution`` is given.
 
-    Returns ``(adata, metrics, summary)``.
+    Returns ``(adata, summary)``.
     """
     from insitucnv.workflow import run_insitucnv
 
@@ -191,11 +192,10 @@ def run_xenium_cnv_protocol(
         step=step,
         lfc_clip=lfc_clip,
         cluster_resolutions=cluster_resolutions,
-        evaluate_resolution_metrics=True,
-        select_resolution_by_metrics=True,
+        primary_resolution=primary_resolution,
     )
     out = result["adata"]
     summary = dict(result["summary"])
     if "sample" in out.obs.columns and out.n_obs:
         summary["sample_id"] = str(out.obs["sample"].iloc[0])
-    return out, result["metrics"], summary
+    return out, summary

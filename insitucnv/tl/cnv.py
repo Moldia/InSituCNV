@@ -125,7 +125,7 @@ def prepare_cnv_input(
     smoothed_layer: str = "M",
     log_layer: str = "log_norm",
     target_sum: float | None = 1e4,
-    smoothing_neighbors: int = 100,
+    smoothing_neighbors: int = 20,
     smoothing_mode: str = "connectivities",
     build_neighbors: bool = True,
     neighbors_n_neighbors: int = 15,

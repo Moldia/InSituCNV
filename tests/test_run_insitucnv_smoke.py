@@ -38,7 +38,7 @@ def test_run_insitucnv_end_to_end(tiny_adata, gene_reference_csv, tmp_path):
     sc.read_h5ad(tmp_path / "adata_cnv.h5ad")
 
 
-def test_run_insitucnv_select_resolution_by_metrics(tiny_adata, gene_reference_csv, tmp_path):
+def test_run_insitucnv_primary_resolution(tiny_adata, gene_reference_csv, tmp_path):
     result = run_insitucnv(
         tiny_adata,
         output_dir=tmp_path,
@@ -49,7 +49,7 @@ def test_run_insitucnv_select_resolution_by_metrics(tiny_adata, gene_reference_c
         window_size=10,
         step=5,
         cluster_resolutions=[0.5, 1.0],
-        select_resolution_by_metrics=True,
+        primary_resolution=1.0,
     )
-    # the key chosen from metrics must actually exist in obs (regression)
+    assert result["primary_cluster_key"] == f"{CNV_LEIDEN_PREFIX}1"
     assert result["primary_cluster_key"] in result["adata"].obs

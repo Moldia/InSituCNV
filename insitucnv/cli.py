@@ -39,7 +39,7 @@ def parse_args(argv: list[str] | None = None):
     )
     parser.add_argument("--neighbors", type=int, default=15, help="Neighbors for expression graph construction.")
     parser.add_argument(
-        "--smooth-neighbors", type=int, default=100, help="Neighbors used for smoothing before inferCNV."
+        "--smooth-neighbors", type=int, default=20, help="Neighbors used for smoothing before inferCNV."
     )
     parser.add_argument("--window-size", type=int, default=60, help="infercnvpy window size.")
     parser.add_argument("--step", type=int, default=10, help="infercnvpy step size.")
@@ -47,12 +47,6 @@ def parse_args(argv: list[str] | None = None):
     parser.add_argument("--chunksize", type=int, default=1000, help="infercnvpy chunksize.")
     parser.add_argument("--cluster-resolutions", default="0.1,0.2,0.3", help="Comma-separated Leiden resolutions.")
     parser.add_argument("--primary-resolution", type=float, help="Resolution reported as the primary CNV clustering.")
-    parser.add_argument(
-        "--select-resolution-by-metrics", action="store_true", help="Select primary resolution by quality metrics."
-    )
-    parser.add_argument(
-        "--evaluate-resolution-metrics", action="store_true", help="Save quality metrics for all resolutions."
-    )
     parser.add_argument(
         "--no-build-neighbors",
         action="store_true",
@@ -111,8 +105,6 @@ def main(argv: list[str] | None = None):
         chunksize=args.chunksize,
         cluster_resolutions=_float_list(args.cluster_resolutions),
         primary_resolution=args.primary_resolution,
-        select_resolution_by_metrics=args.select_resolution_by_metrics,
-        evaluate_resolution_metrics=args.evaluate_resolution_metrics,
     )
 
 
