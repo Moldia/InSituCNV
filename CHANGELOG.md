@@ -14,6 +14,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   normalize → log1p → PCA → `sc.pp.neighbors` graph used for smoothing is built
   automatically. Pass `build_neighbors=False` for the previous behaviour of
   requiring a precomputed graph.
+- `add_genomic_positions()` keeps `chromosome/start/end` already present in
+  `adata.var` instead of always consulting the (network) reference table.
+- `scripts/synthetic_example_dataset.py` builds a small offline dataset used by
+  the notebook-execution CI job.
 - `CONTRIBUTING.md`, this changelog, a ruff config and a pre-commit config.
 
 ### Changed
