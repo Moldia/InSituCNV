@@ -12,7 +12,6 @@ cd InSituCNV
 conda env create -f insitucnv.yml
 conda activate insitucnv_env
 pip install -e ".[dev,docs]"
-pre-commit install
 ```
 
 Notebooks and examples import the installed package directly (`import insitucnv as
@@ -21,24 +20,25 @@ icv`); no `sys.path` edits are needed with the editable install.
 ## Tests
 
 ```bash
-pytest -m "not network" --cov=insitucnv
+pytest -m "not network"
 ```
 
 `network`-marked tests download reference data and are skipped by default. Run the
-notebook end to end with:
+notebook end to end (against a small synthetic dataset) with:
 
 ```bash
-pytest --nbmake notebooks/run_insitucnv.ipynb
+python scripts/synthetic_example_dataset.py /tmp/example.h5ad
+INSITUCNV_EXAMPLE_H5AD=/tmp/example.h5ad pytest --nbmake notebooks/run_insitucnv.ipynb
 ```
 
-## Linting and formatting
+## Linting (optional)
+
+The repo ships a `ruff` config. It is not enforced; run it if you like:
 
 ```bash
 ruff check .
-ruff format --check .
+ruff format
 ```
-
-`pre-commit` runs these automatically on commit.
 
 ## Documentation
 

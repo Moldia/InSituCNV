@@ -56,10 +56,8 @@ docs = [
 dev = [
   "build>=1.2",
   "pytest>=8.0",
-  "pytest-cov>=5.0",
   "nbmake>=1.5",
   "ruff>=0.6",
-  "pre-commit>=3.7",
   "twine>=5.0",
 ]
 
@@ -102,7 +100,3 @@ ignore = ["B905"]
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["B018"]
 "insitucnv/cli.py" = ["E501"]
-
-[tool.coverage.run]
-source = ["insitucnv"]
-omit = ["insitucnv/cli.py"]

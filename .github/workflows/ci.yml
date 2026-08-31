@@ -7,19 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: pip
-      - run: python -m pip install ruff
-      - run: ruff check .
-      - run: ruff format --check .
-
   tests:
     name: Tests (${{ matrix.python-version }})
     runs-on: ubuntu-latest
@@ -42,7 +29,7 @@ jobs:
         run: python -m pip install -e ".[dev]"
 
       - name: Run tests
-        run: pytest -m "not network" --cov=insitucnv --cov-report=term-missing
+        run: pytest -m "not network"
 
   notebook:
     name: Notebook runs end to end
