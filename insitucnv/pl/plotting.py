@@ -50,12 +50,17 @@ def plot_spatial(
     output_path: str | Path | None = None,
     spatial_key: str = "spatial",
     point_size: float = 4.0,
-    palette: str = "tab20",
+    palette: str | None = None,
     invert_yaxis: bool = True,
     title: str | None = None,
     show: bool = False,
 ):
-    """Plot spatial coordinates colored by an ``adata.obs`` column."""
+    """Plot spatial coordinates colored by an ``adata.obs`` column.
+
+    Categorical columns use colors stored in ``adata.uns["<color>_colors"]`` when
+    present; otherwise scanpy's default palette, or the matplotlib colormap named
+    by ``palette``.
+    """
     import matplotlib.pyplot as plt
 
     if spatial_key not in adata.obsm:
@@ -71,13 +76,24 @@ def plot_spatial(
         scatter = ax.scatter(coords[:, 0], coords[:, 1], c=values, s=point_size, cmap="viridis", linewidths=0)
         fig.colorbar(scatter, ax=ax, shrink=0.8)
     else:
-        from matplotlib import colormaps
+        from insitucnv.tl.cnv import _categorical_colors
 
-        categories = pd.Categorical(values.astype(str))
-        cmap = colormaps[palette].resampled(max(len(categories.categories), 1))
-        for idx, category in enumerate(categories.categories):
-            mask = categories == category
-            ax.scatter(coords[mask, 0], coords[mask, 1], s=point_size, color=cmap(idx), label=category, linewidths=0)
+        # Keep an existing category order and adata.uns colors (e.g. those set by
+        # cluster_cnv_resolutions) so the spatial map matches the CNV heatmap.
+        if not isinstance(values.dtype, pd.CategoricalDtype):
+            values = values.astype(str).astype("category")
+        categories = list(values.cat.categories)
+        stored_colors = adata.uns.get(f"{color}_colors")
+        if stored_colors is not None and len(stored_colors) == len(categories):
+            color_lookup = dict(zip(categories, stored_colors))
+        else:
+            color_lookup = dict(zip(categories, _categorical_colors(len(categories), palette)))
+        for category in categories:
+            mask = (values == category).to_numpy()
+            if mask.any():
+                ax.scatter(
+                    coords[mask, 0], coords[mask, 1], s=point_size, color=color_lookup[category], label=category, linewidths=0
+                )
         ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), frameon=False, markerscale=3)
 
     ax.set_title(title or color)

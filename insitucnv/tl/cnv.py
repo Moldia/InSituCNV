@@ -270,18 +270,59 @@ def _subset_mask(adata, subset_key: str | None, subset_values: Sequence[str] | N
     return adata.obs[subset_key].astype(str).isin({str(value) for value in subset_values}).to_numpy()
 
 
-def _set_cluster_palette(adata, key: str, outside_label: str | None = None, palette: str = "tab20"):
+def _natural_sort_key(label: str):
+    """Sort key that orders embedded numbers numerically ("2" < "10", "E2" < "E10")."""
+    import re
+
+    return [(0, int(part), "") if part.isdigit() else (1, 0, part) for part in re.split(r"(\d+)", label)]
+
+
+def _categorical_colors(n: int, palette: str | None = None) -> list[str]:
+    """Return ``n`` hex colors for categorical labels.
+
+    With ``palette=None``, use scanpy's default palettes chosen by the number of
+    categories (``default_20``, ``default_28``, ``default_102``), matching scanpy
+    and infercnvpy plots. Otherwise ``palette`` is a matplotlib colormap name.
+    """
     from matplotlib import colormaps
     from matplotlib.colors import to_hex
 
-    cats = pd.Categorical(adata.obs[key].astype(str)).categories
-    cmap = colormaps[palette].resampled(max(len(cats), 1))
+    if palette is not None:
+        cmap = colormaps[palette].resampled(max(n, 1))
+        return [to_hex(cmap(idx)) for idx in range(n)]
+
+    from scanpy.plotting import palettes
+
+    if n <= 20:
+        colors = palettes.default_20
+    elif n <= 28:
+        colors = palettes.default_28
+    else:
+        colors = palettes.default_102
+        if n > len(colors):
+            warnings.warn(
+                f"{n} categories exceed scanpy's largest palette ({len(colors)} colors); colors will repeat.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+    return [to_hex(colors[idx % len(colors)]) for idx in range(n)]
+
+
+def _set_cluster_palette(adata, key: str, outside_label: str | None = None, palette: str | None = None):
+    # Order clusters numerically (0, 1, 2, ..., 10) rather than lexicographically
+    # (0, 1, 10, 11, ..., 2) so colors follow cluster size order; outside_label goes last.
+    labels = adata.obs[key].astype(str).unique()
+    cats = sorted(
+        labels,
+        key=lambda label: (outside_label is not None and label == str(outside_label), _natural_sort_key(label)),
+    )
+    palette_colors = _categorical_colors(len(cats), palette)
     colors = []
     for idx, category in enumerate(cats):
         if outside_label is not None and str(category) == str(outside_label):
             colors.append("#D3D3D3")
         else:
-            colors.append(to_hex(cmap(idx)))
+            colors.append(palette_colors[idx])
     adata.obs[key] = pd.Categorical(adata.obs[key].astype(str), categories=cats)
     adata.uns[f"{key}_colors"] = colors
 
@@ -295,7 +336,7 @@ def cluster_cnv_resolutions(
     subset_label_prefix: str = "",
     outside_label: str = "other",
     dendrogram: bool = False,
-    palette: str = "tab20",
+    palette: str | None = None,
     copy: bool = False,
     **leiden_kwargs: Any,
 ) -> list[str]:
@@ -304,6 +345,9 @@ def cluster_cnv_resolutions(
     For epithelial-only or tumor-only clustering, pass ``subset_key`` and
     ``subset_values``. The subset labels are written back to the full AnnData
     object, with non-subset cells assigned ``outside_label``.
+
+    Cluster colors use scanpy's default palette unless ``palette`` names a
+    matplotlib colormap (e.g. ``"tab20"``).
     """
     import infercnvpy as cnv
 
