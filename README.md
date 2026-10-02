@@ -14,7 +14,7 @@ InSituCNV builds upon several excellent packages in the single-cell and spatial
 transcriptomics ecosystem:
 
 - **[infercnvpy](https://github.com/icbi-lab/infercnvpy)**: Core CNV inference logic.
-- **[scVelo](https://github.com/theislab/scvelo)**: Transcriptomic smoothing and analysis.
+- **[scVelo](https://github.com/theislab/scvelo)**: The neighbor-graph smoothing is adapted from scVelo's moments (`scv.pp.moments`).
 - **[Scanpy](https://github.com/scverse/scanpy)**: General single-cell analysis framework.
 - **[AnnData](https://github.com/scverse/anndata)**: Data structures for single-cell data.
 
@@ -72,8 +72,11 @@ An `.h5ad` file with:
   from the bundled `infercnvpy` table; pass `gene_reference_path=` a CSV with
   `gene_name,chromosome,start,end` for a different annotation.
 
-A nearest-neighbor graph for smoothing is built automatically when absent
-(`build_neighbors=True`); pass `build_neighbors=False` to require your own.
+Smoothing averages each cell with its neighbors in a graph built with
+`smoothing_neighbors` (default 20, counting the cell itself). An existing
+`adata.uns["neighbors"]` graph is reused only if it was built with that number;
+otherwise a dedicated graph is built under `cnv_smoothing`, leaving your own graph
+untouched. Pass `build_neighbors=False` to require a matching precomputed graph.
 
 ## Outputs and manual annotation
 

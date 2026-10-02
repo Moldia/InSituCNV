@@ -13,9 +13,11 @@ You can import InSituCNV in your Python scripts or notebooks:
 .. code-block:: python
 
    import insitucnv as icv
+   import scanpy as sc
 
-   # Example: smooth data for CNV inference
-   icv.tl.smooth_data_for_cnv(adata)
+   # Example: smooth data for CNV inference over a graph built with 20 neighbors
+   sc.pp.neighbors(adata, n_neighbors=20)
+   icv.tl.smooth_data_for_cnv(adata, n_neighbors=20)
 
    # Example: run inferCNV
    icv.tl.run_infercnv(adata, reference_key='cell_type', reference_categories=['Stromal'])

@@ -59,7 +59,6 @@ def run_insitucnv(
     smoothing_neighbors: int = 20,
     smoothing_mode: str = "connectivities",
     build_neighbors: bool = True,
-    neighbors_n_neighbors: int = 15,
     neighbors_n_pcs: int = 50,
     gene_reference_path: str | Path | None = None,
     window_size: int = 60,
@@ -78,9 +77,11 @@ def run_insitucnv(
 
     The input AnnData should contain raw counts in ``raw_layer`` or in ``X``,
     reference labels in ``adata.obs[reference_key]``, and spatial coordinates in
-    ``adata.obsm[spatial_key]`` if spatial plots are requested. A neighbor graph
-    for smoothing is built automatically when absent (``build_neighbors=True``);
-    pass ``build_neighbors=False`` to require a precomputed graph. Gene symbols in
+    ``adata.obsm[spatial_key]`` if spatial plots are requested. Smoothing uses a
+    neighbor graph built with ``smoothing_neighbors`` (counting the cell itself):
+    ``adata.uns["neighbors"]`` is reused only if built with that number, otherwise
+    a dedicated graph is built (``build_neighbors=True``); pass
+    ``build_neighbors=False`` to require a matching precomputed graph. Gene symbols in
     ``var_names`` are matched to genomic coordinates using the bundled
     ``infercnvpy`` human (GRCh38) table unless ``gene_reference_path`` points to a
     CSV/TSV with ``gene_name,chromosome,start,end`` columns.
@@ -105,7 +106,6 @@ def run_insitucnv(
         smoothing_neighbors=smoothing_neighbors,
         smoothing_mode=smoothing_mode,
         build_neighbors=build_neighbors,
-        neighbors_n_neighbors=neighbors_n_neighbors,
         neighbors_n_pcs=neighbors_n_pcs,
         gene_reference_path=gene_reference_path,
         copy=False,

@@ -4,7 +4,7 @@ References
 InSituCNV builds upon several excellent packages in the single-cell and spatial transcriptomics ecosystem.
 
 * **infercnvpy**: We use `infercnvpy <https://infercnvpy.readthedocs.io/>`_ for the core CNV inference logic.
-* **scVelo**: Smoothing and other transcriptomic analysis steps utilize `scVelo <https://scvelo.readthedocs.io/>`_.
+* **scVelo**: The neighbor-graph smoothing is adapted from the moments computation in `scVelo <https://scvelo.readthedocs.io/>`_.
 * **Scanpy**: General single-cell analysis is powered by `Scanpy <https://scanpy.readthedocs.io/>`_.
 * **AnnData**: Data structures are based on `AnnData <https://anndata.readthedocs.io/>`_.
 

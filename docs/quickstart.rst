@@ -21,7 +21,8 @@ neighbor graph and genomic gene coordinates are added automatically.
        reference_categories=["T_cells", "B_cells", "Stromal"],
        raw_layer="raw_counts",
        cluster_resolutions=[0.1, 0.2, 0.3],
-       # build_neighbors=True by default; gene_reference_path=... for a custom
+       # smoothing_neighbors=20 by default: the smoothing graph is built with
+       # this many neighbors; gene_reference_path=... for a custom
        # gene_name,chromosome,start,end table
    )
 

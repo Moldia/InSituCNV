@@ -22,16 +22,22 @@ def _set_x_from_layer(adata, layer: str | None):
     adata.X = _copy_matrix(adata.layers[layer])
 
 
-def _has_neighbor_graph(adata) -> bool:
-    return "neighbors" in adata.uns and "connectivities" in adata.obsp
+SMOOTHING_NEIGHBORS_KEY = "cnv_smoothing"
 
 
-def _build_neighbor_graph(adata, source_layer: str, n_neighbors: int, n_pcs: int):
+def _graph_n_neighbors(adata, neighbors_key: str) -> int | None:
+    """``n_neighbors`` a stored scanpy graph was built with, or ``None`` if absent."""
+    return adata.uns.get(neighbors_key, {}).get("params", {}).get("n_neighbors")
+
+
+def _build_neighbor_graph(
+    adata, source_layer: str, n_neighbors: int, n_pcs: int, key_added: str = SMOOTHING_NEIGHBORS_KEY
+):
     """Build the standard log1p -> PCA -> kNN graph used for CNV smoothing.
 
     Runs on a scratch copy of ``adata.layers[source_layer]`` so it does not touch
-    ``adata.X`` or existing layers; only the graph, PCA embedding and their
-    ``uns`` entries are copied back.
+    ``adata.X``, existing layers, ``X_pca`` or other neighbor graphs; only the new
+    graph (``adata.uns[key_added]`` and ``adata.obsp[f"{key_added}_*"]``) is copied back.
     """
     import scanpy as sc
 
@@ -40,13 +46,12 @@ def _build_neighbor_graph(adata, source_layer: str, n_neighbors: int, n_pcs: int
     sc.pp.log1p(scratch)
     n_comps = max(2, min(n_pcs, min(scratch.n_obs, scratch.n_vars) - 1))
     sc.pp.pca(scratch, n_comps=n_comps)
-    sc.pp.neighbors(scratch, n_neighbors=n_neighbors)
+    sc.pp.neighbors(scratch, n_neighbors=n_neighbors, key_added=key_added)
 
-    adata.uns["neighbors"] = scratch.uns["neighbors"]
-    adata.uns["pca"] = scratch.uns.get("pca", {})
-    adata.obsm["X_pca"] = scratch.obsm["X_pca"]
-    adata.obsp["distances"] = scratch.obsp["distances"]
-    adata.obsp["connectivities"] = scratch.obsp["connectivities"]
+    graph_info = scratch.uns[key_added]
+    adata.uns[key_added] = graph_info
+    for matrix_key in (graph_info["connectivities_key"], graph_info["distances_key"]):
+        adata.obsp[matrix_key] = scratch.obsp[matrix_key]
 
 
 def _as_dense_vector(values) -> np.ndarray:
@@ -128,7 +133,6 @@ def prepare_cnv_input(
     smoothing_neighbors: int = 20,
     smoothing_mode: str = "connectivities",
     build_neighbors: bool = True,
-    neighbors_n_neighbors: int = 15,
     neighbors_n_pcs: int = 50,
     add_gene_positions: bool = True,
     gene_reference: pd.DataFrame | None = None,
@@ -141,14 +145,18 @@ def prepare_cnv_input(
     Steps:
     1. restore raw counts from ``raw_layer``;
     2. normalize counts into ``normalized_layer``;
-    3. if ``build_neighbors`` and no neighbor graph is present, build the standard
-       log1p -> PCA -> kNN graph used for smoothing;
-    4. smooth normalized counts over the neighbor graph into ``smoothed_layer``;
+    3. choose the smoothing graph: reuse ``adata.uns["neighbors"]`` if it was built
+       with exactly ``smoothing_neighbors``; otherwise, if ``build_neighbors``, build
+       a log1p -> PCA (``neighbors_n_pcs``) -> kNN graph with ``smoothing_neighbors``
+       from ``normalized_layer`` under the key ``"cnv_smoothing"`` (existing graphs and
+       ``X_pca`` are left untouched);
+    4. smooth normalized counts over that graph into ``smoothed_layer``;
     5. normalize/log-transform smoothed counts into ``log_layer`` and ``adata.X``;
     6. optionally add genomic positions required by ``infercnvpy``.
 
-    Pass ``build_neighbors=False`` to require a precomputed graph (the behaviour
-    before this option existed).
+    ``smoothing_neighbors`` follows the scanpy convention (it counts the cell
+    itself). Pass ``build_neighbors=False`` to require a precomputed
+    ``adata.uns["neighbors"]`` graph built with ``smoothing_neighbors``.
     """
     from insitucnv.tl.moments import smooth_data_for_cnv
 
@@ -157,24 +165,37 @@ def prepare_cnv_input(
         out.layers[raw_layer] = _copy_matrix(out.X)
 
     normalize_counts(out, input_layer=raw_layer, output_layer=normalized_layer, target_sum=target_sum)
-    if not _has_neighbor_graph(out):
-        if not build_neighbors:
-            raise ValueError(
-                "adata has no neighbor graph and build_neighbors=False. Run "
-                "scanpy.pp.neighbors first, or leave build_neighbors=True."
-            )
+
+    existing_n_neighbors = _graph_n_neighbors(out, "neighbors")
+    if existing_n_neighbors == smoothing_neighbors:
+        neighbors_key = "neighbors"
+        graph_built = False
+    elif build_neighbors:
+        neighbors_key = SMOOTHING_NEIGHBORS_KEY
+        graph_built = True
         _build_neighbor_graph(
             out,
             source_layer=normalized_layer,
-            n_neighbors=neighbors_n_neighbors,
+            n_neighbors=smoothing_neighbors,
             n_pcs=neighbors_n_pcs,
+            key_added=neighbors_key,
         )
+    else:
+        found = "no graph" if existing_n_neighbors is None else f"a graph built with n_neighbors={existing_n_neighbors}"
+        raise ValueError(
+            f"build_neighbors=False requires adata.uns['neighbors'] built with "
+            f"n_neighbors={smoothing_neighbors} (smoothing_neighbors), but found {found}. "
+            f"Run sc.pp.neighbors(adata, n_neighbors={smoothing_neighbors}) first, or leave "
+            "build_neighbors=True."
+        )
+
     smooth_data_for_cnv(
         out,
         layer_w_norm_counts=normalized_layer,
         n_neighbors=smoothing_neighbors,
         mode=smoothing_mode,
         output_layer=smoothed_layer,
+        neighbors_key=neighbors_key,
     )
     log_normalize_counts(out, input_layer=smoothed_layer, output_layer=log_layer, target_sum=target_sum)
 
@@ -196,7 +217,8 @@ def prepare_cnv_input(
         "target_sum": target_sum,
         "smoothing_neighbors": smoothing_neighbors,
         "smoothing_mode": smoothing_mode,
-        "neighbors_built": build_neighbors,
+        "smoothing_neighbors_key": neighbors_key,
+        "smoothing_graph_built": graph_built,
     }
     return out
 

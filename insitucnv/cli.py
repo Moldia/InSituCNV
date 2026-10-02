@@ -37,9 +37,17 @@ def parse_args(argv: list[str] | None = None):
     parser.add_argument(
         "--min-genes", type=int, default=10, help="Minimum detected genes per cell during Xenium preprocessing."
     )
-    parser.add_argument("--neighbors", type=int, default=15, help="Neighbors for expression graph construction.")
     parser.add_argument(
-        "--smooth-neighbors", type=int, default=20, help="Neighbors used for smoothing before inferCNV."
+        "--neighbors",
+        type=int,
+        default=15,
+        help="Neighbors for the expression graph used for cell-type clustering (not smoothing).",
+    )
+    parser.add_argument(
+        "--smooth-neighbors",
+        type=int,
+        default=20,
+        help="Neighbors (incl. the cell itself) of the graph used for smoothing before inferCNV.",
     )
     parser.add_argument("--window-size", type=int, default=60, help="infercnvpy window size.")
     parser.add_argument("--step", type=int, default=10, help="infercnvpy step size.")
@@ -50,7 +58,7 @@ def parse_args(argv: list[str] | None = None):
     parser.add_argument(
         "--no-build-neighbors",
         action="store_true",
-        help="Require a precomputed neighbor graph instead of building one for smoothing.",
+        help="Require a precomputed neighbor graph built with --smooth-neighbors instead of building one.",
     )
     parser.add_argument(
         "--gene-reference-path",
@@ -97,7 +105,6 @@ def main(argv: list[str] | None = None):
         target_sum=args.target_sum,
         smoothing_neighbors=args.smooth_neighbors,
         build_neighbors=not args.no_build_neighbors,
-        neighbors_n_neighbors=args.neighbors,
         gene_reference_path=args.gene_reference_path,
         window_size=args.window_size,
         step=args.step,
