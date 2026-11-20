@@ -1,5 +1,7 @@
 # InSituCNV
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24393812.svg)](https://doi.org/10.5281/zenodo.24393812)
+
 Reusable notebook workflow for inferring copy-number variation (CNV) profiles
 from image-based spatial transcriptomics data.
 

@@ -6,6 +6,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-20
+
 ### Added
 - `prepare_cnv_input()` / `run_insitucnv()` gain `build_neighbors` (default
   `True`): when the AnnData has no neighbor graph, the standard
