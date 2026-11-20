@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: "If you use InSituCNV, please cite the article below and the software version you used."
+type: software
+title: "InSituCNV"
+abstract: "Copy-number variation inference for image-based spatial transcriptomics."
+authors:
+  - family-names: "Jensen"
+    given-names: "Augusta"
+    affiliation: "Science for Life Laboratory, Department of Biochemistry and Biophysics, Stockholm University, Stockholm, Sweden"
+    orcid: "https://orcid.org/0009-0003-1211-5008"
+version: "0.1.1"
+date-released: "2026-11-20"
+license: BSD-3-Clause
+repository-code: "https://github.com/Moldia/InSituCNV"
+url: "https://insitucnv.readthedocs.io/"
+keywords:
+  - copy-number variation
+  - spatial transcriptomics
+  - single-cell
+  - bioinformatics
+preferred-citation:
+  type: article
+  title: "In Situ Inference of Copy Number Variations in Image-Based Spatial Transcriptomics"
+  authors:
+    - family-names: "Jensen"
+      given-names: "A."
+    - family-names: "Crowell"
+      given-names: "H."
+    - family-names: "Pascual Reguant"
+      given-names: "A."
+    - family-names: "Ruano"
+      given-names: "I."
+    - family-names: "Tejpar"
+      given-names: "S."
+    - family-names: "Heyn"
+      given-names: "H."
+    - family-names: "Nilsson"
+      given-names: "M."
+    - family-names: "Marco Salas"
+      given-names: "S."
+  journal: "bioRxiv"
+  year: 2025
+  doi: "10.1101/2025.07.02.662761"
