@@ -7,8 +7,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
-- `insitucnv.download_example_dataset()` fetches a small demo `.h5ad` so the
-  notebook and quickstart run out of the box without preparing your own data.
 - `prepare_cnv_input()` / `run_insitucnv()` gain `build_neighbors` (default
   `True`): when the AnnData has no neighbor graph, the standard
   normalize → log1p → PCA → `sc.pp.neighbors` graph used for smoothing is built
@@ -30,7 +28,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `prepare_cnv_input()`, `run_insitucnv()` and the CLI).
 - The shipped notebook `notebooks/run_insitucnv.ipynb` was rewritten to use the
   package API end to end (no direct `infercnvpy` calls) and to run top to bottom
-  on the example dataset.
+  on your own `.h5ad`.
 - Package version is now single-sourced from `insitucnv/__about__.py`.
 
 ### Removed

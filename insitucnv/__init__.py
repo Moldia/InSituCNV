@@ -18,7 +18,6 @@ _PIPELINE_EXPORTS = {
     "run_xenium_cnv_protocol",
 }
 _WORKFLOW_EXPORTS = {"run_insitucnv"}
-_DATASET_EXPORTS = {"download_example_dataset", "example_dataset_path"}
 
 
 def __getattr__(name: str):
@@ -26,8 +25,6 @@ def __getattr__(name: str):
         module = import_module("insitucnv.pipeline")
     elif name in _WORKFLOW_EXPORTS:
         module = import_module("insitucnv.workflow")
-    elif name in _DATASET_EXPORTS:
-        module = import_module("insitucnv.datasets")
     else:
         raise AttributeError(f"module 'insitucnv' has no attribute {name!r}")
 
@@ -39,8 +36,6 @@ def __getattr__(name: str):
 __all__ = [
     "__version__",
     "annotate_cell_types",
-    "download_example_dataset",
-    "example_dataset_path",
     "load_xenium_dataset",
     "pl",
     "pp",

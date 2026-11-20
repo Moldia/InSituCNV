@@ -11,8 +11,7 @@ neighbor graph and genomic gene coordinates are added automatically.
    import scanpy as sc
    import insitucnv as icv
 
-   # Try it with the bundled example, or use sc.read_h5ad("sample.h5ad")
-   adata = sc.read_h5ad(icv.download_example_dataset())
+   adata = sc.read_h5ad("sample.h5ad")
 
    result = icv.run_insitucnv(
        adata,

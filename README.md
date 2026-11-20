@@ -44,7 +44,7 @@ conda activate insitucnv_env
 import scanpy as sc
 import insitucnv as icv
 
-adata = sc.read_h5ad(icv.download_example_dataset())   # or your own .h5ad
+adata = sc.read_h5ad("sample.h5ad")   # your own data, see below
 
 result = icv.run_insitucnv(
     adata,
@@ -55,7 +55,7 @@ result = icv.run_insitucnv(
 ```
 
 Or work through `notebooks/run_insitucnv.ipynb`, which runs the same steps one at
-a time and downloads the example dataset by default.
+a time on your own `.h5ad`.
 
 ## What You Need Before Running
 

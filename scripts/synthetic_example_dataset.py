@@ -4,9 +4,8 @@
 
 The output has raw counts, ``obsm['spatial']`` and a ``cell_type`` column with
 reference (T_cells/B_cells/Stromal) and Epithelial cells that carry a chr7 gain
-and a chr10 loss, so the CNV workflow produces a visible signal. This is *not*
-the published example dataset (see make_example_dataset.py) - it is a stand-in so
-the notebook can run without network access.
+and a chr10 loss, so the CNV workflow produces a visible signal. It is a test
+stand-in so the notebook can run without network access.
 """
 
 from __future__ import annotations

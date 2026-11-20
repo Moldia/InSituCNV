@@ -7,7 +7,6 @@ API Reference
 
    insitucnv
    insitucnv.cli
-   insitucnv.datasets
    insitucnv.pipeline
    insitucnv.workflow
    insitucnv.pp
